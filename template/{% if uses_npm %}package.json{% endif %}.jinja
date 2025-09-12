@@ -1,5 +1,8 @@
 {% set content %}
 devDependencies: {
+{% if uses_markdownlint %}
+  "markdownlint-cli2": "0.18.1",
+{% endif %}
 {% if uses_prettier %}
   "prettier": "3.6.2",
 {% endif %}

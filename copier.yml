@@ -30,6 +30,7 @@ file_type_tools:
       - prettier
     markdown:
       - prettier
+      - markdownlint
     json:
       - prettier
     yaml:
@@ -51,6 +52,8 @@ tool_config_file_types:
       - json # package.json, package-lock.json
     prettier:
       - json # package.json
+    markdownlint:
+      - yaml # .markdownlint.yml
     tombi:
       - toml # pyproject.toml
   when: false
@@ -63,6 +66,7 @@ tool_installed_by:
     pre-commit: uv
     npm:
     prettier: npm
+    markdownlint: npm
     tombi: uv
   when: false
 
@@ -262,6 +266,11 @@ uses_npm:
 uses_prettier:
   type: bool
   default: "{{ 'prettier' in used_tools }}"
+  when: false
+
+uses_markdownlint:
+  type: bool
+  default: "{{ 'markdownlint' in used_tools }}"
   when: false
 
 uses_tombi:

@@ -78,6 +78,15 @@ repos:
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && npx prettier --write --ignore-unknown "${@}"' --
         types: [text]
 {% endif %}
+{% if uses_markdownlint %}
+  - repo: local
+    hooks:
+      - id: markdownlint
+        name: "markdown: lint"
+        language: system
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && npx markdownlint-cli2 --fix "${@}"' --
+        types: [markdown]
+{% endif %}
 {% if uses_tombi %}
   - repo: local
     hooks:

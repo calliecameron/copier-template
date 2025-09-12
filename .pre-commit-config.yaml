@@ -70,6 +70,13 @@ repos:
         types: [text]
   - repo: local
     hooks:
+      - id: markdownlint
+        name: "markdown: lint"
+        language: system
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && npx markdownlint-cli2 --fix "${@}"' --
+        types: [markdown]
+  - repo: local
+    hooks:
       - id: tombi-lint
         name: "toml: lint"
         language: system
