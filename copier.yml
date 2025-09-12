@@ -5,6 +5,7 @@ _envops:
   lstrip_blocks: true
 _jinja_extensions:
   - copier_template_extensions.TemplateExtensionLoader
+  - cookiecutter.extensions.SlugifyExtension
   - extensions/extensions.py:StrictUndefinedExtension
   - extensions/extensions.py:GitExtension
   - extensions/extensions.py:ExpandFileTypesExtension

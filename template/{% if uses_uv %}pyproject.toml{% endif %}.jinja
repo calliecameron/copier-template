@@ -1,5 +1,5 @@
 [project]
-name = "{{ project_name }}"
+name = "{{ project_name | slugify }}"
 version = "{{ project_version }}"
 requires-python = "=={{ python_version }}"
 dependencies = []
@@ -7,6 +7,7 @@ dependencies = []
 [dependency-groups]
 dev = [
   {% if uses_copier %}
+  "cookiecutter>=2.6.0",
   "copier>=9.10.2",
   "copier-template-extensions>=0.3.3",
   {% endif %}
