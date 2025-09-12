@@ -4,9 +4,12 @@ all: lint test
 .PHONY: deps
 deps: .deps-installed
 
-.deps-installed: {% if uses_uv%}pyproject.toml uv.lock{% endif +%}
+.deps-installed: {% if uses_uv%}pyproject.toml uv.lock{% endif +%}{% if uses_npm %} package.json package-lock.json{% endif +%}
 {% if uses_uv %}
 	uv sync
+{% endif %}
+{% if uses_npm %}
+	npm install
 {% endif %}
 {% if uses_pre_commit %}
 	uv run pre-commit install -f
@@ -27,6 +30,9 @@ update_deps:
 {% if uses_uv %}
 	uv lock --upgrade
 {% endif %}
+{% if uses_npm %}
+	npm update
+{% endif %}
 {% if uses_pre_commit %}
 	uv run pre-commit autoupdate
 {% endif %}
@@ -46,4 +52,7 @@ clean:
 deepclean: clean
 {% if uses_uv %}
 	rm -rf .venv
+{% endif %}
+{% if uses_npm %}
+	rm -rf node_modules
 {% endif %}

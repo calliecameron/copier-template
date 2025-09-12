@@ -14,6 +14,8 @@ _subdirectory: template
 _tasks:
   - command: uv lock
     when: "{{ uses_uv }}"
+  - command: bash -c 'source "${NVM_DIR}/nvm.sh" && npm install'
+    when: "{{ uses_npm }}"
 
 file_type_tools:
   type: yaml
@@ -38,6 +40,8 @@ tool_config_file_types:
       - yaml # .copier-answers.yml
     pre-commit:
       - yaml # .pre-commit-config.yaml
+    npm:
+      - json # package.json, package-lock.json
   when: false
 
 tool_installed_by:
@@ -46,6 +50,7 @@ tool_installed_by:
     uv:
     copier: uv
     pre-commit: uv
+    npm:
   when: false
 
 always_existing_file_types:
@@ -72,12 +77,6 @@ project_version:
   help: Project version
   default: "0.0.0"
   validator: "{% if not project_version %}Project version must not be empty{% endif %}"
-
-python_version:
-  type: str
-  help: Python version
-  default: "3.13.7"
-  validator: "{% if not python_version %}Python version must not be empty{% endif %}"
 
 author_name:
   type: str
@@ -241,3 +240,21 @@ uses_pre_commit:
   type: bool
   default: "{{ 'pre-commit' in used_tools }}"
   when: false
+
+uses_npm:
+  type: bool
+  default: "{{ 'npm' in used_tools }}"
+  when: false
+
+python_version:
+  type: str
+  help: Python version
+  default: "3.13.7"
+  validator: "{% if not python_version %}Python version must not be empty{% endif %}"
+
+node_version:
+  type: str
+  help: Node version
+  default: "24.7.0"
+  validator: "{% if not node_version %}Node version must not be empty{% endif %}"
+  when: "{{ uses_npm }}"

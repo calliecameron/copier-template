@@ -13,6 +13,16 @@ repos:
       - id: uv-lock
         name: "uv: sync"
 {% endif %}
+{% if uses_npm %}
+  - repo: local
+    hooks:
+      - id: npm-lock
+        name: "npm: sync"
+        language: system
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && npm install'
+        files: "^(package\\.json|package-lock\\.json)$"
+        pass_filenames: false
+{% endif %}
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
