@@ -1,0 +1,43 @@
+.PHONY: all
+all: lint test
+
+.PHONY: deps
+deps: .deps-installed
+
+.deps-installed: {% if uses_uv%}pyproject.toml uv.lock{% endif +%}
+{% if uses_uv %}
+	uv sync
+{% endif %}
+{% if uses_pre_commit %}
+	uv run pre-commit install -f
+{% endif %}
+	touch .deps-installed
+
+.PHONY: lint
+lint: deps
+{% if uses_pre_commit %}
+	uv run pre-commit run -a
+{% endif %}
+
+.PHONY: test
+test: deps
+
+.PHONY: update_deps
+update_deps:
+
+{% if uses_copier %}
+.PHONY: update_template
+update_template: deps
+	uv run copier update --trust
+{% endif %}
+
+.PHONY: clean
+clean:
+	find . '(' -type f -name '*~' ')' -delete
+	rm -f .deps-installed
+
+.PHONY: deepclean
+deepclean: clean
+{% if uses_uv %}
+	rm -rf .venv
+{% endif %}
