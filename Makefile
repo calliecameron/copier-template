@@ -18,6 +18,8 @@ test: deps
 
 .PHONY: update_deps
 update_deps:
+	uv lock --upgrade
+	uv run pre-commit autoupdate
 
 .PHONY: update_template
 update_template: deps

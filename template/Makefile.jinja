@@ -24,6 +24,12 @@ test: deps
 
 .PHONY: update_deps
 update_deps:
+{% if uses_uv %}
+	uv lock --upgrade
+{% endif %}
+{% if uses_pre_commit %}
+	uv run pre-commit autoupdate
+{% endif %}
 
 {% if uses_copier %}
 .PHONY: update_template
