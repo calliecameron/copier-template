@@ -11,6 +11,14 @@ repos:
     hooks:
       - id: uv-lock
         name: "uv: sync"
+  - repo: local
+    hooks:
+      - id: npm-lock
+        name: "npm: sync"
+        language: system
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && npm install'
+        files: "^(package\\.json|package-lock\\.json)$"
+        pass_filenames: false
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
@@ -53,3 +61,10 @@ repos:
         entry: found copier update rejection files; review and remove them before merging
         language: fail
         files: "\\.rej$"
+  - repo: local
+    hooks:
+      - id: prettier
+        name: "general: prettier"
+        language: system
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && npx prettier --write --ignore-unknown "${@}"' --
+        types: [text]

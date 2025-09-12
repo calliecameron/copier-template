@@ -23,11 +23,17 @@ file_type_tools:
     shell:
     python:
     javascript:
+      - prettier
     html:
+      - prettier
     css:
+      - prettier
     markdown:
+      - prettier
     json:
+      - prettier
     yaml:
+      - prettier
     toml:
   when: false
 
@@ -42,6 +48,8 @@ tool_config_file_types:
       - yaml # .pre-commit-config.yaml
     npm:
       - json # package.json, package-lock.json
+    prettier:
+      - json # package.json
   when: false
 
 tool_installed_by:
@@ -51,6 +59,7 @@ tool_installed_by:
     copier: uv
     pre-commit: uv
     npm:
+    prettier: npm
   when: false
 
 always_existing_file_types:
@@ -244,6 +253,11 @@ uses_pre_commit:
 uses_npm:
   type: bool
   default: "{{ 'npm' in used_tools }}"
+  when: false
+
+uses_prettier:
+  type: bool
+  default: "{{ 'prettier' in used_tools }}"
   when: false
 
 python_version:

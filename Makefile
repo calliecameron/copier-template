@@ -4,8 +4,9 @@ all: lint test
 .PHONY: deps
 deps: .deps-installed
 
-.deps-installed: pyproject.toml uv.lock
+.deps-installed: pyproject.toml uv.lock package.json package-lock.json
 	uv sync
+	npm install
 	uv run pre-commit install -f
 	touch .deps-installed
 
@@ -19,6 +20,7 @@ test: deps
 .PHONY: update_deps
 update_deps:
 	uv lock --upgrade
+	npm update
 	uv run pre-commit autoupdate
 
 .PHONY: update_template
@@ -33,3 +35,4 @@ clean:
 .PHONY: deepclean
 deepclean: clean
 	rm -rf .venv
+	rm -rf node_modules

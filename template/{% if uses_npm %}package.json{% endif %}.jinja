@@ -1,4 +1,11 @@
-{
-  "devDependencies": {
+{% set content %}
+devDependencies: {
+{% if uses_prettier %}
+  "prettier": "3.6.2",
+{% endif %}
   }
-}
+{% if uses_prettier %}
+prettier: {}
+{% endif %}
+{% endset %}
+{{ content | from_yaml | to_nice_json(indent=2) }}
