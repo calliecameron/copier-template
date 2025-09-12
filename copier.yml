@@ -1,0 +1,242 @@
+_min_copier_version: "9.10.2"
+_envops:
+  keep_trailing_newline: true
+  trim_blocks: true
+  lstrip_blocks: true
+_jinja_extensions:
+  - copier_template_extensions.TemplateExtensionLoader
+  - extensions/extensions.py:StrictUndefinedExtension
+  - extensions/extensions.py:GitExtension
+  - extensions/extensions.py:ExpandFileTypesExtension
+  - extensions/extensions.py:ExpandToolsExtension
+_subdirectory: template
+_tasks:
+  - command: uv lock
+    when: "{{ uses_uv }}"
+
+file_type_tools:
+  type: yaml
+  default:
+    shell:
+    python:
+    javascript:
+    html:
+    css:
+    markdown:
+    json:
+    yaml:
+    toml:
+  when: false
+
+tool_config_file_types:
+  type: yaml
+  default:
+    uv:
+      - toml # pyproject.toml
+    copier:
+      - yaml # .copier-answers.yml
+    pre-commit:
+      - yaml # .pre-commit-config.yaml
+  when: false
+
+tool_installed_by:
+  type: yaml
+  default:
+    uv:
+    copier: uv
+    pre-commit: uv
+  when: false
+
+always_existing_file_types:
+  type: yaml
+  default:
+    - markdown # README.md
+  when: false
+
+always_used_tools:
+  type: yaml
+  default:
+    - uv
+    - copier
+    - pre-commit
+  when: false
+
+project_name:
+  type: str
+  help: Project name
+  validator: "{% if not project_name %}Project name must not be empty{% endif %}"
+
+project_version:
+  type: str
+  help: Project version
+  default: "0.0.0"
+  validator: "{% if not project_version %}Project version must not be empty{% endif %}"
+
+python_version:
+  type: str
+  help: Python version
+  default: "3.13.7"
+  validator: "{% if not python_version %}Python version must not be empty{% endif %}"
+
+author_name:
+  type: str
+  help: Author name
+  default: "{{ '' | git_user_name }}"
+  validator: "{% if not author_name %}Author name must not be empty{% endif %}"
+
+copyright_start_year:
+  type: str
+  default: "{{ copyright_start_year | default('%Y' | strftime) }}"
+  when: false
+
+copyright_end_year:
+  type: str
+  default: "{{ '%Y' | strftime }}"
+  when: false
+
+user_has_shell:
+  type: bool
+  help: Has shell scripts?
+  default: false
+
+user_has_python:
+  type: bool
+  help: Has python?
+  default: false
+
+user_has_javascript:
+  type: bool
+  help: Has javascript?
+  default: false
+
+user_has_html:
+  type: bool
+  help: Has HTML?
+  default: false
+
+user_has_css:
+  type: bool
+  help: Has CSS?
+  default: false
+
+user_has_markdown:
+  type: bool
+  help: Has markdown?
+  default: false
+
+user_has_json:
+  type: bool
+  help: Has json?
+  default: false
+
+user_has_yaml:
+  type: bool
+  help: Has yaml?
+  default: false
+
+user_has_toml:
+  type: bool
+  help: Has toml?
+  default: false
+
+user_file_types:
+  type: yaml
+  default: |
+    {% if user_has_shell %}
+    - shell
+    {% endif %}
+    {% if user_has_python %}
+    - python
+    {% endif %}
+    {% if user_has_javascript %}
+    - javascript
+    {% endif %}
+    {% if user_has_html %}
+    - html
+    {% endif %}
+    {% if user_has_css %}
+    - css
+    {% endif %}
+    {% if user_has_markdown %}
+    - markdown
+    {% endif %}
+    {% if user_has_json %}
+    - json
+    {% endif %}
+    {% if user_has_yaml %}
+    - yaml
+    {% endif %}
+    {% if user_has_toml %}
+    - toml
+    {% endif %}
+  when: false
+
+file_types:
+  type: yaml
+  default: "{{ user_file_types | expand_file_types(file_type_tools, tool_config_file_types, tool_installed_by, always_existing_file_types, always_used_tools) }}"
+  when: false
+
+has_shell:
+  type: bool
+  default: "{{ 'shell' in file_types }}"
+  when: false
+
+has_python:
+  type: bool
+  default: "{{ 'python' in file_types }}"
+  when: false
+
+has_javascript:
+  type: bool
+  default: "{{ 'javascript' in file_types }}"
+  when: false
+
+has_html:
+  type: bool
+  default: "{{ 'html' in file_types }}"
+  when: false
+
+has_css:
+  type: bool
+  default: "{{ 'css' in file_types }}"
+  when: false
+
+has_markdown:
+  type: bool
+  default: "{{ 'markdown' in file_types }}"
+  when: false
+
+has_json:
+  type: bool
+  default: "{{ 'json' in file_types }}"
+  when: false
+
+has_yaml:
+  type: bool
+  default: "{{ 'yaml' in file_types }}"
+  when: false
+
+has_toml:
+  type: bool
+  default: "{{ 'toml' in file_types }}"
+  when: false
+
+used_tools:
+  type: yaml
+  default: "{{ file_types | expand_tools(file_type_tools, always_used_tools) }}"
+  when: false
+
+uses_uv:
+  type: bool
+  default: "{{ 'uv' in used_tools }}"
+  when: false
+
+uses_copier:
+  type: bool
+  default: "{{ 'copier' in used_tools }}"
+  when: false
+
+uses_pre_commit:
+  type: bool
+  default: "{{ 'pre-commit' in used_tools }}"
+  when: false

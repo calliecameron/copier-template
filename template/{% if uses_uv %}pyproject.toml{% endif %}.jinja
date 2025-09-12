@@ -1,0 +1,16 @@
+[project]
+name = "{{ project_name }}"
+version = "{{ project_version }}"
+requires-python = "=={{ python_version }}"
+dependencies = []
+
+[dependency-groups]
+dev = [
+  {% if uses_copier %}
+  "copier>=9.10.2",
+  "copier-template-extensions>=0.3.3",
+  {% endif %}
+  {% if uses_pre_commit %}
+  "pre-commit>=4.3.0",
+  {% endif %}
+]
