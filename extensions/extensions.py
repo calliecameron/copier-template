@@ -50,10 +50,12 @@ def expand_file_types(
         for file_type in next:
             tools.update(file_type_tools[file_type] or [])
 
+        installers = set()
         for tool in tools:
             installed_by = tool_installed_by[tool]
             if installed_by:
-                tools.add(installed_by)
+                installers.add(installed_by)
+        tools.update(installers)
 
         for tool in tools:
             next.update(tool_config_file_types[tool] or [])
@@ -72,12 +74,26 @@ class ExpandFileTypesExtension(Extension):
 def expand_tools(
     file_types: list[str],
     file_type_tools: dict[str, list[str] | None],
+    tool_installed_by: dict[str, str | None],
     always_used_tools: list[str] | None,
 ) -> list[str]:
-    tools = set(always_used_tools or [])
+    current = set(always_used_tools or [])
     for file_type in file_types:
-        tools.update(file_type_tools[file_type] or [])
-    return sorted(tools)
+        current.update(file_type_tools[file_type] or [])
+
+    while True:
+        next = set(current)
+
+        installers = set()
+        for tool in next:
+            installed_by = tool_installed_by[tool]
+            if installed_by:
+                installers.add(installed_by)
+        next.update(installers)
+
+        if next == current:
+            return sorted(next)
+        current = next
 
 
 class ExpandToolsExtension(Extension):
