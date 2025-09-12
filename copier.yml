@@ -223,7 +223,7 @@ has_toml:
 
 used_tools:
   type: yaml
-  default: "{{ file_types | expand_tools(file_type_tools, always_used_tools) }}"
+  default: "{{ file_types | expand_tools(file_type_tools, tool_installed_by, always_used_tools) }}"
   when: false
 
 uses_uv:
