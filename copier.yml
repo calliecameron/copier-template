@@ -35,6 +35,7 @@ file_type_tools:
     yaml:
       - prettier
     toml:
+      - tombi
   when: false
 
 tool_config_file_types:
@@ -50,6 +51,8 @@ tool_config_file_types:
       - json # package.json, package-lock.json
     prettier:
       - json # package.json
+    tombi:
+      - toml # pyproject.toml
   when: false
 
 tool_installed_by:
@@ -60,6 +63,7 @@ tool_installed_by:
     pre-commit: uv
     npm:
     prettier: npm
+    tombi: uv
   when: false
 
 always_existing_file_types:
@@ -258,6 +262,11 @@ uses_npm:
 uses_prettier:
   type: bool
   default: "{{ 'prettier' in used_tools }}"
+  when: false
+
+uses_tombi:
+  type: bool
+  default: "{{ 'tombi' in used_tools }}"
   when: false
 
 python_version:

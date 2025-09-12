@@ -78,3 +78,17 @@ repos:
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && npx prettier --write --ignore-unknown "${@}"' --
         types: [text]
 {% endif %}
+{% if uses_tombi %}
+  - repo: local
+    hooks:
+      - id: tombi-lint
+        name: "toml: lint"
+        language: system
+        entry: uv run tombi lint
+        types: [toml]
+      - id: tombi-format
+        name: "toml: format"
+        language: system
+        entry: uv run tombi format
+        types: [toml]
+{% endif %}

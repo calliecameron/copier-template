@@ -14,4 +14,11 @@ dev = [
   {% if uses_pre_commit %}
   "pre-commit>=4.3.0",
   {% endif %}
+  {% if uses_tombi %}
+  "tombi>=0.6.5",
+  {% endif %}
 ]
+
+{% if uses_tombi %}
+[tool.tombi]
+{% endif %}
