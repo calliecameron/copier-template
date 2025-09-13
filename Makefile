@@ -18,9 +18,11 @@ lint: deps
 test: deps
 
 .PHONY: update_deps
-update_deps:
+update_deps: deps
 	uv lock --upgrade
-	npm update
+	npm outdated --parseable | cut -d : -f 4 | xargs npm install --save-exact
+	rm -rf node_modules
+	npm install
 	uv run pre-commit autoupdate
 
 .PHONY: update_template

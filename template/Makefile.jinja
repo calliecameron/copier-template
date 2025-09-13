@@ -26,12 +26,14 @@ lint: deps
 test: deps
 
 .PHONY: update_deps
-update_deps:
+update_deps: deps
 {% if uses_uv %}
 	uv lock --upgrade
 {% endif %}
 {% if uses_npm %}
-	npm update
+	npm outdated --parseable | cut -d : -f 4 | xargs npm install --save-exact
+	rm -rf node_modules
+	npm install
 {% endif %}
 {% if uses_pre_commit %}
 	uv run pre-commit autoupdate
