@@ -53,7 +53,7 @@ tool_config_file_types:
     prettier:
       - json # package.json
     markdownlint:
-      - yaml # .markdownlint.yml
+      - json # .markdownlint.json
     tombi:
       - toml # pyproject.toml
   when: false
