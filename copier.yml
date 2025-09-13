@@ -55,6 +55,7 @@ file_type_tools:
   default:
     shell:
       - shellcheck
+      - shfmt
     python:
     javascript:
       - prettier
@@ -87,6 +88,7 @@ tool_config_file_types:
     prettier: # also .prettierignore
       - json # package.json
     shellcheck: # .shellcheckrc
+    shfmt: # .editorconfig
     markdownlint:
       - json # .markdownlint.json
     tombi:
@@ -107,6 +109,7 @@ tool_installed_by:
     npm:
     prettier: npm
     shellcheck: uv
+    shfmt:
     markdownlint: npm
     tombi: uv
     typos: uv
@@ -319,6 +322,11 @@ uses_prettier:
 uses_shellcheck:
   type: bool
   default: "{{ 'shellcheck' in used_tools }}"
+  when: false
+
+uses_shfmt:
+  type: bool
+  default: "{{ 'shfmt' in used_tools }}"
   when: false
 
 uses_markdownlint:

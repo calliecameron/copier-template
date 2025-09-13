@@ -89,6 +89,13 @@ repos:
         exclude_types: [zsh]
         require_serial: true
 {% endif %}
+{% if uses_shfmt %}
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.12.0-2
+    hooks:
+      - id: shfmt
+        name: "shell: format"
+{% endif %}
 {% if uses_markdownlint %}
   - repo: local
     hooks:
