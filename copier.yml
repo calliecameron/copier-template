@@ -12,6 +12,20 @@ _jinja_extensions:
   - extensions/extensions.py:ExpandFileTypesExtension
   - extensions/extensions.py:ExpandToolsExtension
 _subdirectory: template
+_message_after_copy: |
+
+  ------
+  Template applied successfully. Run 'make' to verify.
+
+  You may also want to run 'make update_deps' in case the versions installed by
+  the template are outdated.
+_message_after_update: |
+
+  ------
+  Template applied successfully. Run 'make' to verify.
+
+  You may also want to run 'make update_deps' in case the versions installed by
+  the template are outdated.
 _skip_if_exists:
   - .nvmrc
 _tasks:
