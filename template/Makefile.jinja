@@ -9,7 +9,7 @@ deps: .deps-installed
 	uv sync
 {% endif %}
 {% if uses_npm %}
-	bash -c 'source "$${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
+	./.template_scripts/npm_install_deps.sh
 {% endif %}
 {% if uses_pre_commit %}
 	uv run pre-commit install -f
@@ -31,11 +31,7 @@ update_deps: deps
 	uv lock --upgrade
 {% endif %}
 {% if uses_npm %}
-	bash -c 'source "$${NVM_DIR}/nvm.sh" && nvm use --save stable'
-	bash -c 'source "$${NVM_DIR}/nvm.sh" && nvm exec --silent npm outdated --parseable' | cut -d : -f 4 | xargs bash -c 'source "$${NVM_DIR}/nvm.sh" && nv exec --silent npm install --save-exact "$${@}"' --
-	rm -f package-lock.json
-	rm -rf node_modules
-	bash -c 'source "$${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
+	./.template_scripts/npm_update_deps.sh
 {% endif %}
 {% if uses_pre_commit %}
 	uv run pre-commit autoupdate
