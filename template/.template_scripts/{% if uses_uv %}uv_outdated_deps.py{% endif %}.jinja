@@ -30,7 +30,7 @@ def main() -> None:
     deps = extract_deps(pyproject_toml["project"]["dependencies"])
     group_deps = {
         group: extract_deps(v)
-        for (group, v) in pyproject_toml.get(["dependency-groups"], {}).items()
+        for (group, v) in pyproject_toml.get("dependency-groups", {}).items()
     }
 
     outdated = {item["name"]: item["latest_version"] for item in outdated_json}
