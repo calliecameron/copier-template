@@ -31,7 +31,7 @@ _skip_if_exists:
 _tasks:
   - command: uv lock
     when: "{{ uses_uv }}"
-  - command: bash -c 'source "${NVM_DIR}/nvm.sh" && npm install'
+  - command: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
     when: "{{ uses_npm }}"
 
 default_node_version:

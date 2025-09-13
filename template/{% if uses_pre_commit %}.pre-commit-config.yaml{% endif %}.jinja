@@ -19,7 +19,7 @@ repos:
       - id: npm-lock
         name: "npm: sync"
         language: system
-        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && npm install'
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
         files: "^(package\\.json|package-lock\\.json)$"
         pass_filenames: false
 {% endif %}
@@ -75,7 +75,7 @@ repos:
       - id: prettier
         name: "general: prettier"
         language: system
-        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && npx prettier --write --ignore-unknown "${@}"' --
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx prettier --write --ignore-unknown "${@}"' --
         types: [text]
 {% endif %}
 {% if uses_markdownlint %}
@@ -84,7 +84,7 @@ repos:
       - id: markdownlint
         name: "markdown: lint"
         language: system
-        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && npx markdownlint-cli2 --fix "${@}"' --
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx markdownlint-cli2 --fix "${@}"' --
         types: [markdown]
 {% endif %}
 {% if uses_tombi %}

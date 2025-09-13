@@ -6,7 +6,7 @@ deps: .deps-installed
 
 .deps-installed: pyproject.toml uv.lock package.json package-lock.json
 	uv sync
-	npm install
+	bash -c 'source "$${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
 	uv run pre-commit install -f
 	touch .deps-installed
 
@@ -21,10 +21,10 @@ test: deps
 update_deps: deps
 	uv lock --upgrade
 	bash -c 'source "$${NVM_DIR}/nvm.sh" && nvm use --save stable'
-	npm outdated --parseable | cut -d : -f 4 | xargs npm install --save-exact
+	bash -c 'source "$${NVM_DIR}/nvm.sh" && nvm exec --silent npm outdated --parseable' | cut -d : -f 4 | xargs bash -c 'source "$${NVM_DIR}/nvm.sh" && nv exec --silent npm install --save-exact "$${@}"' --
 	rm -f package-lock.json
 	rm -rf node_modules
-	npm install
+	bash -c 'source "$${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
 	uv run pre-commit autoupdate
 
 .PHONY: update_template
