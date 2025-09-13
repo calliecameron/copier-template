@@ -166,13 +166,13 @@ dev = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "cookiecutter", specifier = ">=2.6.0" },
-    { name = "copier", specifier = ">=9.10.2" },
-    { name = "copier-template-extensions", specifier = ">=0.3.3" },
-    { name = "gitlint", specifier = ">=0.19.1" },
-    { name = "pre-commit", specifier = ">=4.3.0" },
-    { name = "tombi", specifier = ">=0.6.5" },
-    { name = "typos", specifier = ">=1.36.2" },
+    { name = "cookiecutter", specifier = "==2.6.0" },
+    { name = "copier", specifier = "==9.10.2" },
+    { name = "copier-template-extensions", specifier = "==0.3.3" },
+    { name = "gitlint", specifier = "==0.19.1" },
+    { name = "pre-commit", specifier = "==4.3.0" },
+    { name = "tombi", specifier = "==0.6.5" },
+    { name = "typos", specifier = "==1.36.2" },
 ]
 
 [[package]]
