@@ -42,20 +42,21 @@ file_type_tools:
 tool_config_file_types:
   type: yaml
   default:
-    uv:
+    uv: # also .python-version, uv.lock
       - toml # pyproject.toml
     copier:
       - yaml # .copier-answers.yml
     pre-commit:
       - yaml # .pre-commit-config.yaml
-    npm:
+    npm: # also .nvmrc, .npmrc
       - json # package.json, package-lock.json
-    prettier:
+    prettier: # also .prettierignore
       - json # package.json
     markdownlint:
       - json # .markdownlint.json
     tombi:
       - toml # pyproject.toml
+    gitlint: # .gitlint
   when: false
 
 tool_installed_by:
@@ -68,6 +69,7 @@ tool_installed_by:
     prettier: npm
     markdownlint: npm
     tombi: uv
+    gitlint: uv
   when: false
 
 always_existing_file_types:
@@ -82,6 +84,7 @@ always_used_tools:
     - uv
     - copier
     - pre-commit
+    - gitlint
   when: false
 
 project_name:
@@ -276,6 +279,11 @@ uses_markdownlint:
 uses_tombi:
   type: bool
   default: "{{ 'tombi' in used_tools }}"
+  when: false
+
+uses_gitlint:
+  type: bool
+  default: "{{ 'gitlint' in used_tools }}"
   when: false
 
 python_version:

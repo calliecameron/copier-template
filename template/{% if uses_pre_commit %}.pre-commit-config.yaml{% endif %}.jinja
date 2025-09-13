@@ -101,3 +101,12 @@ repos:
         entry: uv run tombi format
         types: [toml]
 {% endif %}
+{% if uses_gitlint %}
+  - repo: local
+    hooks:
+      - id: gitlint
+        name: "general: check commit message"
+        language: system
+        entry: uv run gitlint --staged --msg-filename
+        stages: [commit-msg]
+{% endif %}

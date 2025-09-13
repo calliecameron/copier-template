@@ -11,6 +11,9 @@ dev = [
   "copier>=9.10.2",
   "copier-template-extensions>=0.3.3",
   {% endif %}
+  {% if uses_gitlint %}
+  "gitlint>=0.19.1",
+  {% endif %}
   {% if uses_pre_commit %}
   "pre-commit>=4.3.0",
   {% endif %}
