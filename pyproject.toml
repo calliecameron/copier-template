@@ -19,6 +19,9 @@ dev = [
 [tool.tombi]
 
 [tool.typos]
+files.extend-exclude = [
+  "/.copier-answers.yml",
+]
 default.extend-ignore-re = [
   "(?Rm)^.*(#|//)\\s*spellchecker: *disable-line$",
   "(?s)(#|//)\\s*spellchecker:* off.*?\\n\\s*(#|//)\\s*spellchecker:* on",

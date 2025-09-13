@@ -34,6 +34,11 @@ dev = [
 
 {% if uses_typos %}
 [tool.typos]
+files.extend-exclude = [
+{% if uses_copier %}
+  "/{{ _copier_conf.answers_file }}",
+{% endif %}
+]
 default.extend-ignore-re = [
   "(?Rm)^.*(#|//)\\s*spellchecker: *disable-line$",
   "(?s)(#|//)\\s*spellchecker:* off.*?\\n\\s*(#|//)\\s*spellchecker:* on",
