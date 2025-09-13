@@ -1,0 +1,8 @@
+{% set content %}
+{
+{% if uses_shellcheck %}
+  "shellcheck.executablePath": "${workspaceFolder}/.venv/bin/shellcheck",
+{% endif %}
+}
+{% endset %}
+{{ content | from_yaml | to_nice_json(indent=2) }}

@@ -118,6 +118,7 @@ always_existing_file_types:
   type: yaml
   default:
     - markdown # README.md
+    - json # .vscode/settings.json
   when: false
 
 always_used_tools:
