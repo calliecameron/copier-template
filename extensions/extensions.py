@@ -27,6 +27,21 @@ class GitExtension(Extension):
         environment.filters["git_user_name"] = git_user_name
 
 
+def stable_node_version(_: str) -> str:
+    return subprocess.run(
+        ["bash", "-c", 'source "${NVM_DIR}/nvm.sh" && nvm version stable'],
+        capture_output=True,
+        check=True,
+        encoding="utf-8",
+    ).stdout.strip()
+
+
+class NvmExtension(Extension):
+    def __init__(self, environment: Environment) -> None:
+        super().__init__(environment)
+        environment.filters["stable_node_version"] = stable_node_version
+
+
 def expand_file_types(
     user_file_types: list[str] | None,
     file_type_tools: dict[str, list[str] | None],

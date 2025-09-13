@@ -8,14 +8,22 @@ _jinja_extensions:
   - cookiecutter.extensions.SlugifyExtension
   - extensions/extensions.py:StrictUndefinedExtension
   - extensions/extensions.py:GitExtension
+  - extensions/extensions.py:NvmExtension
   - extensions/extensions.py:ExpandFileTypesExtension
   - extensions/extensions.py:ExpandToolsExtension
 _subdirectory: template
+_skip_if_exists:
+  - .nvmrc
 _tasks:
   - command: uv lock
     when: "{{ uses_uv }}"
   - command: bash -c 'source "${NVM_DIR}/nvm.sh" && npm install'
     when: "{{ uses_npm }}"
+
+default_node_version:
+  type: str
+  default: "{{ '' | stable_node_version }}"
+  when: false
 
 file_type_tools:
   type: yaml
@@ -309,10 +317,3 @@ python_version:
   help: Python version
   default: "3.13.7"
   validator: "{% if not python_version %}Python version must not be empty{% endif %}"
-
-node_version:
-  type: str
-  help: Node version
-  default: "v24.7.0"
-  validator: "{% if not node_version %}Node version must not be empty{% endif %}"
-  when: "{{ uses_npm }}"
