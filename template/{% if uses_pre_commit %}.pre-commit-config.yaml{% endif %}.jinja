@@ -101,6 +101,13 @@ repos:
         entry: uv run tombi format
         types: [toml]
 {% endif %}
+{% if uses_gitleaks %}
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks
+        name: "general: check for committed secrets"
+{% endif %}
 {% if uses_gitlint %}
   - repo: local
     hooks:

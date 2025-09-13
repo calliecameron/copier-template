@@ -56,6 +56,8 @@ tool_config_file_types:
       - json # .markdownlint.json
     tombi:
       - toml # pyproject.toml
+    gitleaks:
+      - toml # .gitleaks.toml
     gitlint: # .gitlint
   when: false
 
@@ -69,6 +71,7 @@ tool_installed_by:
     prettier: npm
     markdownlint: npm
     tombi: uv
+    gitleaks:
     gitlint: uv
   when: false
 
@@ -84,6 +87,7 @@ always_used_tools:
     - uv
     - copier
     - pre-commit
+    - gitleaks
     - gitlint
   when: false
 
@@ -279,6 +283,11 @@ uses_markdownlint:
 uses_tombi:
   type: bool
   default: "{{ 'tombi' in used_tools }}"
+  when: false
+
+uses_gitleaks:
+  type: bool
+  default: "{{ 'gitleaks' in used_tools }}"
   when: false
 
 uses_gitlint:

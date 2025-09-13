@@ -87,6 +87,11 @@ repos:
         language: system
         entry: uv run tombi format
         types: [toml]
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks
+        name: "general: check for committed secrets"
   - repo: local
     hooks:
       - id: gitlint
