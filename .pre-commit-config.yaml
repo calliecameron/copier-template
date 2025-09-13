@@ -70,6 +70,15 @@ repos:
         types: [text]
   - repo: local
     hooks:
+      - id: shellcheck
+        name: "shell: lint"
+        language: system
+        entry: uv run shellcheck
+        types: [shell]
+        exclude_types: [zsh]
+        require_serial: true
+  - repo: local
+    hooks:
       - id: markdownlint
         name: "markdown: lint"
         language: system

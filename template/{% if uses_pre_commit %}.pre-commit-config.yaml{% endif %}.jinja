@@ -78,6 +78,17 @@ repos:
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx prettier --write --ignore-unknown "${@}"' --
         types: [text]
 {% endif %}
+{% if uses_shellcheck %}
+  - repo: local
+    hooks:
+      - id: shellcheck
+        name: "shell: lint"
+        language: system
+        entry: uv run shellcheck
+        types: [shell]
+        exclude_types: [zsh]
+        require_serial: true
+{% endif %}
 {% if uses_markdownlint %}
   - repo: local
     hooks:
