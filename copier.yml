@@ -313,6 +313,6 @@ python_version:
 node_version:
   type: str
   help: Node version
-  default: "24.7.0"
+  default: "v24.7.0"
   validator: "{% if not node_version %}Node version must not be empty{% endif %}"
   when: "{{ uses_npm }}"

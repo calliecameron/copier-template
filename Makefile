@@ -22,6 +22,7 @@ update_deps: deps
 	uv lock --upgrade
 	bash -c 'source "$${NVM_DIR}/nvm.sh" && nvm use --save stable'
 	npm outdated --parseable | cut -d : -f 4 | xargs npm install --save-exact
+	rm -f package-lock.json
 	rm -rf node_modules
 	npm install
 	uv run pre-commit autoupdate
