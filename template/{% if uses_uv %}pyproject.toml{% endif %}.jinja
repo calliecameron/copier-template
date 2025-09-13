@@ -1,7 +1,7 @@
 [project]
 name = "{{ project_name | slugify }}"
 version = "{{ project_version }}"
-requires-python = "=={{ python_version }}"
+requires-python = "=={{ existing_python_version or default_python_version }}"
 dependencies = []
 
 [dependency-groups]

@@ -8,6 +8,7 @@ _jinja_extensions:
   - cookiecutter.extensions.SlugifyExtension
   - extensions/extensions.py:StrictUndefinedExtension
   - extensions/extensions.py:GitExtension
+  - extensions/extensions.py:UvExtension
   - extensions/extensions.py:NvmExtension
   - extensions/extensions.py:ExpandFileTypesExtension
   - extensions/extensions.py:ExpandToolsExtension
@@ -34,9 +35,19 @@ _tasks:
   - command: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
     when: "{{ uses_npm }}"
 
+default_python_version:
+  type: str
+  default: "{{ '' | get_stable_python_version }}"
+  when: false
+
+existing_python_version:
+  type: str
+  default: "{{ '' | get_existing_python_version }}"
+  when: false
+
 default_node_version:
   type: str
-  default: "{{ '' | stable_node_version }}"
+  default: "{{ '' | get_stable_node_version }}"
   when: false
 
 file_type_tools:
@@ -131,7 +142,7 @@ project_version:
 author_name:
   type: str
   help: Author name
-  default: "{{ '' | git_user_name }}"
+  default: "{{ '' | get_git_user_name }}"
   validator: "{% if not author_name %}Author name must not be empty{% endif %}"
 
 copyright_start_year:
@@ -325,9 +336,3 @@ uses_gitlint:
   type: bool
   default: "{{ 'gitlint' in used_tools }}"
   when: false
-
-python_version:
-  type: str
-  help: Python version
-  default: "3.13.7"
-  validator: "{% if not python_version %}Python version must not be empty{% endif %}"

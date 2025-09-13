@@ -1,3 +1,5 @@
+import json
+import re
 import subprocess
 
 from jinja2 import Environment, StrictUndefined
@@ -10,7 +12,7 @@ class StrictUndefinedExtension(Extension):
         environment.undefined = StrictUndefined
 
 
-def git_user_name(default: str) -> str:
+def get_git_user_name(default: str) -> str:
     result = subprocess.run(
         ["git", "config", "user.name"],
         capture_output=True,
@@ -24,10 +26,47 @@ def git_user_name(default: str) -> str:
 class GitExtension(Extension):
     def __init__(self, environment: Environment) -> None:
         super().__init__(environment)
-        environment.filters["git_user_name"] = git_user_name
+        environment.filters["get_git_user_name"] = get_git_user_name
 
 
-def stable_node_version(_: str) -> str:
+def get_stable_python_version(_: str) -> str:
+    j = json.loads(
+        subprocess.run(
+            ["uv", "python", "list", "--output-format=json", "cpython"],
+            capture_output=True,
+            check=True,
+            encoding="utf-8",
+        ).stdout
+    )
+
+    versions = set()
+    for version in [v["version"] for v in j]:
+        if re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version) is None:
+            continue
+        versions.add(tuple(int(part) for part in version.split(".")))
+
+    if not versions:
+        raise ValueError("Can't find a default python version")
+
+    return ".".join(str(v) for v in sorted(versions, reverse=True)[0])
+
+
+def get_existing_python_version(_: str) -> str:
+    try:
+        with open(".python-version") as f:
+            return f.read().strip()
+    except OSError:
+        return ""
+
+
+class UvExtension(Extension):
+    def __init__(self, environment: Environment) -> None:
+        super().__init__(environment)
+        environment.filters["get_stable_python_version"] = get_stable_python_version
+        environment.filters["get_existing_python_version"] = get_existing_python_version
+
+
+def get_stable_node_version(_: str) -> str:
     return subprocess.run(
         ["bash", "-c", 'source "${NVM_DIR}/nvm.sh" && nvm version stable'],
         capture_output=True,
@@ -39,7 +78,7 @@ def stable_node_version(_: str) -> str:
 class NvmExtension(Extension):
     def __init__(self, environment: Environment) -> None:
         super().__init__(environment)
-        environment.filters["stable_node_version"] = stable_node_version
+        environment.filters["get_stable_node_version"] = get_stable_node_version
 
 
 def expand_file_types(
