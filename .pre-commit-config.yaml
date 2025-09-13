@@ -87,6 +87,13 @@ repos:
         language: system
         entry: uv run tombi format
         types: [toml]
+  - repo: local
+    hooks:
+      - id: typos
+        name: "general: spellcheck"
+        language: system
+        entry: uv run typos --write-changes --force-exclude
+        types: [text]
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.28.0
     hooks:

@@ -20,8 +20,20 @@ dev = [
   {% if uses_tombi %}
   "tombi>=0.6.5",
   {% endif %}
+  {% if uses_typos %}
+  "typos>=1.36.2",
+  {% endif %}
 ]
 
 {% if uses_tombi %}
 [tool.tombi]
+{% endif %}
+
+{% if uses_typos %}
+[tool.typos]
+default.extend-ignore-re = [
+  "(?Rm)^.*(#|//)\\s*spellchecker: *disable-line$",
+  "(?s)(#|//)\\s*spellchecker:* off.*?\\n\\s*(#|//)\\s*spellchecker:* on",
+  "(#|//)\\s*spellchecker:* disable-next-line\\n.*",
+]
 {% endif %}

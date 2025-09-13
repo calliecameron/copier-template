@@ -101,6 +101,15 @@ repos:
         entry: uv run tombi format
         types: [toml]
 {% endif %}
+{% if uses_typos %}
+  - repo: local
+    hooks:
+      - id: typos
+        name: "general: spellcheck"
+        language: system
+        entry: uv run typos --write-changes --force-exclude
+        types: [text]
+{% endif %}
 {% if uses_gitleaks %}
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.28.0

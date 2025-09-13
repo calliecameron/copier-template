@@ -12,6 +12,14 @@ dev = [
   "gitlint>=0.19.1",
   "pre-commit>=4.3.0",
   "tombi>=0.6.5",
+  "typos>=1.36.2",
 ]
 
 [tool.tombi]
+
+[tool.typos]
+default.extend-ignore-re = [
+  "(?Rm)^.*(#|//)\\s*spellchecker: *disable-line$",
+  "(?s)(#|//)\\s*spellchecker:* off.*?\\n\\s*(#|//)\\s*spellchecker:* on",
+  "(#|//)\\s*spellchecker:* disable-next-line\\n.*",
+]
