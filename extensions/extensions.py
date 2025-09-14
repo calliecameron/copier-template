@@ -75,18 +75,31 @@ class UvExtension(Extension):
 class NvmExtension(Extension):
     def __init__(self, environment: Environment) -> None:
         super().__init__(environment)
-        environment.filters["get_stable_node_version"] = (
-            NvmExtension.get_stable_node_version
-        )
+        environment.filters["get_node_version"] = NvmExtension.get_node_version
 
     @staticmethod
-    def get_stable_node_version(_: str) -> str:
+    def _default_node_version() -> str:
         return subprocess.run(
             ["bash", "-c", 'source "${NVM_DIR}/nvm.sh" && nvm version stable'],
             capture_output=True,
             check=True,
             encoding="utf-8",
         ).stdout.strip()
+
+    @staticmethod
+    def _existing_node_version() -> str:
+        try:
+            with open(".nvmrc") as f:
+                return f.read().strip()
+        except OSError:
+            return ""
+
+    @staticmethod
+    def get_node_version(_: str) -> str:
+        return (
+            NvmExtension._existing_node_version()
+            or NvmExtension._default_node_version()
+        )
 
 
 class ExpandFileTypesExtension(Extension):

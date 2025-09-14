@@ -27,8 +27,6 @@ _message_after_update: |
 
   You may also want to run 'make update_deps' in case the versions installed by
   the template are outdated.
-_skip_if_exists:
-  - .nvmrc
 _tasks:
   - command: uv lock
     when: "{{ uses_uv }}"
@@ -40,9 +38,9 @@ python_version:
   default: "{{ '' | get_python_version }}"
   when: false
 
-default_node_version:
+node_version:
   type: str
-  default: "{{ '' | get_stable_node_version }}"
+  default: "{{ '' | get_node_version }}"
   when: false
 
 file_type_tools:
