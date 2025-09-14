@@ -12,145 +12,153 @@ class StrictUndefinedExtension(Extension):
         environment.undefined = StrictUndefined
 
 
-def get_git_user_name(default: str) -> str:
-    result = subprocess.run(
-        ["git", "config", "user.name"],
-        capture_output=True,
-        encoding="utf-8",
-    )
-    if result.returncode == 0 and result.stdout.strip():
-        return result.stdout.strip()
-    return default
-
-
 class GitExtension(Extension):
     def __init__(self, environment: Environment) -> None:
         super().__init__(environment)
-        environment.filters["get_git_user_name"] = get_git_user_name
+        environment.filters["get_git_user_name"] = GitExtension.get_git_user_name
 
-
-def get_stable_python_version(_: str) -> str:
-    j = json.loads(
-        subprocess.run(
-            ["uv", "python", "list", "--output-format=json", "cpython"],
+    @staticmethod
+    def get_git_user_name(default: str) -> str:
+        result = subprocess.run(
+            ["git", "config", "user.name"],
             capture_output=True,
-            check=True,
             encoding="utf-8",
-        ).stdout
-    )
-
-    versions = set()
-    for version in [v["version"] for v in j]:
-        if re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version) is None:
-            continue
-        versions.add(tuple(int(part) for part in version.split(".")))
-
-    if not versions:
-        raise ValueError("Can't find a default python version")
-
-    return ".".join(str(v) for v in sorted(versions, reverse=True)[0])
-
-
-def get_existing_python_version(_: str) -> str:
-    try:
-        with open(".python-version") as f:
-            return f.read().strip()
-    except OSError:
-        return ""
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            return result.stdout.strip()
+        return default
 
 
 class UvExtension(Extension):
     def __init__(self, environment: Environment) -> None:
         super().__init__(environment)
-        environment.filters["get_stable_python_version"] = get_stable_python_version
-        environment.filters["get_existing_python_version"] = get_existing_python_version
+        environment.filters["get_stable_python_version"] = (
+            UvExtension.get_stable_python_version
+        )
+        environment.filters["get_existing_python_version"] = (
+            UvExtension.get_existing_python_version
+        )
 
+    @staticmethod
+    def get_stable_python_version(_: str) -> str:
+        j = json.loads(
+            subprocess.run(
+                ["uv", "python", "list", "--output-format=json", "cpython"],
+                capture_output=True,
+                check=True,
+                encoding="utf-8",
+            ).stdout
+        )
 
-def get_stable_node_version(_: str) -> str:
-    return subprocess.run(
-        ["bash", "-c", 'source "${NVM_DIR}/nvm.sh" && nvm version stable'],
-        capture_output=True,
-        check=True,
-        encoding="utf-8",
-    ).stdout.strip()
+        versions = set()
+        for version in [v["version"] for v in j]:
+            if re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version) is None:
+                continue
+            versions.add(tuple(int(part) for part in version.split(".")))
+
+        if not versions:
+            raise ValueError("Can't find a default python version")
+
+        return ".".join(str(v) for v in sorted(versions, reverse=True)[0])
+
+    @staticmethod
+    def get_existing_python_version(_: str) -> str:
+        try:
+            with open(".python-version") as f:
+                return f.read().strip()
+        except OSError:
+            return ""
 
 
 class NvmExtension(Extension):
     def __init__(self, environment: Environment) -> None:
         super().__init__(environment)
-        environment.filters["get_stable_node_version"] = get_stable_node_version
+        environment.filters["get_stable_node_version"] = (
+            NvmExtension.get_stable_node_version
+        )
 
-
-def expand_file_types(
-    user_file_types: list[str] | None,
-    file_type_tools: dict[str, list[str] | None],
-    tool_config_file_types: dict[str, list[str] | None],
-    tool_installed_by: dict[str, str | None],
-    always_existing_file_types: list[str] | None,
-    always_used_tools: list[str] | None,
-) -> list[str]:
-    always_used_tools = always_used_tools or []
-
-    current = set(user_file_types or [])
-    current.update(always_existing_file_types or [])
-    for tool in always_used_tools:
-        current.update(tool_config_file_types[tool] or [])
-
-    tools = set(always_used_tools)
-
-    while True:
-        next = set(current)
-
-        for file_type in next:
-            tools.update(file_type_tools[file_type] or [])
-
-        installers = set()
-        for tool in tools:
-            installed_by = tool_installed_by[tool]
-            if installed_by:
-                installers.add(installed_by)
-        tools.update(installers)
-
-        for tool in tools:
-            next.update(tool_config_file_types[tool] or [])
-
-        if next == current:
-            return sorted(next)
-        current = next
+    @staticmethod
+    def get_stable_node_version(_: str) -> str:
+        return subprocess.run(
+            ["bash", "-c", 'source "${NVM_DIR}/nvm.sh" && nvm version stable'],
+            capture_output=True,
+            check=True,
+            encoding="utf-8",
+        ).stdout.strip()
 
 
 class ExpandFileTypesExtension(Extension):
     def __init__(self, environment: Environment) -> None:
         super().__init__(environment)
-        environment.filters["expand_file_types"] = expand_file_types
+        environment.filters["expand_file_types"] = (
+            ExpandFileTypesExtension.expand_file_types
+        )
 
+    @staticmethod
+    def expand_file_types(
+        user_file_types: list[str] | None,
+        file_type_tools: dict[str, list[str] | None],
+        tool_config_file_types: dict[str, list[str] | None],
+        tool_installed_by: dict[str, str | None],
+        always_existing_file_types: list[str] | None,
+        always_used_tools: list[str] | None,
+    ) -> list[str]:
+        always_used_tools = always_used_tools or []
 
-def expand_tools(
-    file_types: list[str],
-    file_type_tools: dict[str, list[str] | None],
-    tool_installed_by: dict[str, str | None],
-    always_used_tools: list[str] | None,
-) -> list[str]:
-    current = set(always_used_tools or [])
-    for file_type in file_types:
-        current.update(file_type_tools[file_type] or [])
+        current = set(user_file_types or [])
+        current.update(always_existing_file_types or [])
+        for tool in always_used_tools:
+            current.update(tool_config_file_types[tool] or [])
 
-    while True:
-        next = set(current)
+        tools = set(always_used_tools)
 
-        installers = set()
-        for tool in next:
-            installed_by = tool_installed_by[tool]
-            if installed_by:
-                installers.add(installed_by)
-        next.update(installers)
+        while True:
+            next = set(current)
 
-        if next == current:
-            return sorted(next)
-        current = next
+            for file_type in next:
+                tools.update(file_type_tools[file_type] or [])
+
+            installers = set()
+            for tool in tools:
+                installed_by = tool_installed_by[tool]
+                if installed_by:
+                    installers.add(installed_by)
+            tools.update(installers)
+
+            for tool in tools:
+                next.update(tool_config_file_types[tool] or [])
+
+            if next == current:
+                return sorted(next)
+            current = next
 
 
 class ExpandToolsExtension(Extension):
     def __init__(self, environment: Environment) -> None:
         super().__init__(environment)
-        environment.filters["expand_tools"] = expand_tools
+        environment.filters["expand_tools"] = ExpandToolsExtension.expand_tools
+
+    @staticmethod
+    def expand_tools(
+        file_types: list[str],
+        file_type_tools: dict[str, list[str] | None],
+        tool_installed_by: dict[str, str | None],
+        always_used_tools: list[str] | None,
+    ) -> list[str]:
+        current = set(always_used_tools or [])
+        for file_type in file_types:
+            current.update(file_type_tools[file_type] or [])
+
+        while True:
+            next = set(current)
+
+            installers = set()
+            for tool in next:
+                installed_by = tool_installed_by[tool]
+                if installed_by:
+                    installers.add(installed_by)
+            next.update(installers)
+
+            if next == current:
+                return sorted(next)
+            current = next
