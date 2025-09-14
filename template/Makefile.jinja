@@ -36,8 +36,8 @@ update_deps: deps
 {% if uses_pre_commit %}
 	uv run pre-commit autoupdate
 {% endif %}
-
 {% if uses_copier %}
+
 .PHONY: update_template
 update_template: deps
 	uv run copier update --trust
