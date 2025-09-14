@@ -36,5 +36,6 @@ clean:
 deepclean: clean
 	rm -rf .venv
 	rm -rf node_modules
+	find . -depth '(' -type d -name '__pycache__' ')' -exec rm -r '{}' ';'
 	rm -rf .ruff_cache
 	rm -rf .mypy_cache

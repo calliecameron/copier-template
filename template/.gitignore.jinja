@@ -6,6 +6,9 @@
 {% if uses_npm %}
 /node_modules/
 {% endif %}
+{% if has_python %}
+__pycache__/
+{% endif %}
 {% if uses_ruff %}
 /.ruff_cache/
 {% endif %}

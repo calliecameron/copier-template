@@ -56,6 +56,9 @@ deepclean: clean
 {% if uses_npm %}
 	rm -rf node_modules
 {% endif %}
+{% if has_python %}
+	find . -depth '(' -type d -name '__pycache__' ')' -exec rm -r '{}' ';'
+{% endif %}
 {% if uses_ruff %}
 	rm -rf .ruff_cache
 {% endif %}
