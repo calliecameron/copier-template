@@ -131,6 +131,15 @@ repos:
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx markdownlint-cli2 --fix "${@}"' --
         types: [markdown]
 {% endif %}
+{% if uses_yamllint %}
+  - repo: local
+    hooks:
+      - id: yamllint
+        name: "yaml: lint"
+        language: system
+        entry: uv run yamllint --strict
+        types: [yaml]
+{% endif %}
 {% if uses_tombi %}
   - repo: local
     hooks:

@@ -113,6 +113,13 @@ repos:
         types: [markdown]
   - repo: local
     hooks:
+      - id: yamllint
+        name: "yaml: lint"
+        language: system
+        entry: uv run yamllint --strict
+        types: [yaml]
+  - repo: local
+    hooks:
       - id: tombi-lint
         name: "toml: lint"
         language: system

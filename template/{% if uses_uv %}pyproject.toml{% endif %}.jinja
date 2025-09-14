@@ -32,6 +32,9 @@ dev = [
   {% if uses_typos %}
   "typos==1.36.2",
   {% endif %}
+  {% if uses_yamllint %}
+  "yamllint==1.37.1",
+  {% endif %}
 ]
 {% if uses_mypy %}
 

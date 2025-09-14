@@ -65,6 +65,7 @@ file_type_tools:
       - prettier
     yaml:
       - prettier
+      - yamllint
     toml:
       - tombi
   when: false
@@ -90,6 +91,8 @@ tool_config_file_types:
       - toml # pyproject.toml
     markdownlint:
       - json # .markdownlint.json
+    yamllint:
+      - yaml # .yamllint.yml
     tombi:
       - toml # pyproject.toml
     typos:
@@ -112,6 +115,7 @@ tool_installed_by:
     ruff: uv
     mypy: uv
     markdownlint: npm
+    yamllint: uv
     tombi: uv
     typos: uv
     gitleaks:
@@ -343,6 +347,11 @@ uses_mypy:
 uses_markdownlint:
   type: bool
   default: "{{ 'markdownlint' in used_tools }}"
+  when: false
+
+uses_yamllint:
+  type: bool
+  default: "{{ 'yamllint' in used_tools }}"
   when: false
 
 uses_tombi:
