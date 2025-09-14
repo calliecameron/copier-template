@@ -122,6 +122,15 @@ repos:
         types_or: [python, pyi]
         require_serial: true
 {% endif %}
+{% if uses_eslint %}
+  - repo: local
+    hooks:
+      - id: eslint
+        name: "javascript: lint"
+        language: system
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx eslint --fix "${@}"' --
+        types: [javascript]
+{% endif %}
 {% if uses_stylelint %}
   - repo: local
     hooks:

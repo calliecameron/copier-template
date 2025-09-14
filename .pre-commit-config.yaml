@@ -106,6 +106,13 @@ repos:
         require_serial: true
   - repo: local
     hooks:
+      - id: eslint
+        name: "javascript: lint"
+        language: system
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx eslint --fix "${@}"' --
+        types: [javascript]
+  - repo: local
+    hooks:
       - id: stylelint
         name: "css: lint"
         language: system
