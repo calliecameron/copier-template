@@ -35,14 +35,9 @@ _tasks:
   - command: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
     when: "{{ uses_npm }}"
 
-default_python_version:
+python_version:
   type: str
-  default: "{{ '' | get_stable_python_version }}"
-  when: false
-
-existing_python_version:
-  type: str
-  default: "{{ '' | get_existing_python_version }}"
+  default: "{{ '' | get_python_version }}"
   when: false
 
 default_node_version:

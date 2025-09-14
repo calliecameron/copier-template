@@ -32,15 +32,10 @@ class GitExtension(Extension):
 class UvExtension(Extension):
     def __init__(self, environment: Environment) -> None:
         super().__init__(environment)
-        environment.filters["get_stable_python_version"] = (
-            UvExtension.get_stable_python_version
-        )
-        environment.filters["get_existing_python_version"] = (
-            UvExtension.get_existing_python_version
-        )
+        environment.filters["get_python_version"] = UvExtension.get_python_version
 
     @staticmethod
-    def get_stable_python_version(_: str) -> str:
+    def _default_python_version() -> str:
         j = json.loads(
             subprocess.run(
                 ["uv", "python", "list", "--output-format=json", "cpython"],
@@ -62,12 +57,19 @@ class UvExtension(Extension):
         return ".".join(str(v) for v in sorted(versions, reverse=True)[0])
 
     @staticmethod
-    def get_existing_python_version(_: str) -> str:
+    def _existing_python_version() -> str:
         try:
             with open(".python-version") as f:
                 return f.read().strip()
         except OSError:
             return ""
+
+    @staticmethod
+    def get_python_version(_: str) -> str:
+        return (
+            UvExtension._existing_python_version()
+            or UvExtension._default_python_version()
+        )
 
 
 class NvmExtension(Extension):
