@@ -10,12 +10,21 @@ dev = [
   "copier==9.10.2",
   "copier-template-extensions==0.3.3",
   "gitlint==0.19.1",
+  "mypy==1.18.1",
   "pre-commit==4.3.0",
   "ruff==0.13.0",
   "shellcheck-py==0.11.0.1",
   "tombi==0.6.6",
   "typos==1.36.2",
 ]
+
+[tool.mypy]
+mypy_path = "stubs"
+namespace_packages = false
+pretty = true
+python_version = "3.13"
+scripts_are_modules = true
+strict = true
 
 [tool.ruff]
 line-length = 88

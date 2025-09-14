@@ -98,6 +98,14 @@ repos:
         require_serial: true
   - repo: local
     hooks:
+      - id: mypy
+        name: "python: typecheck"
+        language: system
+        entry: uv run mypy
+        types_or: [python, pyi]
+        require_serial: true
+  - repo: local
+    hooks:
       - id: markdownlint
         name: "markdown: lint"
         language: system

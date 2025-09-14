@@ -14,6 +14,9 @@ dev = [
   {% if uses_gitlint %}
   "gitlint==0.19.1",
   {% endif %}
+  {% if uses_mypy %}
+  "mypy==1.18.1",
+  {% endif %}
   {% if uses_pre_commit %}
   "pre-commit==4.3.0",
   {% endif %}
@@ -30,6 +33,16 @@ dev = [
   "typos==1.36.2",
   {% endif %}
 ]
+{% if uses_mypy %}
+
+[tool.mypy]
+mypy_path = "stubs"
+namespace_packages = false
+pretty = true
+python_version = "{{ python_version.split(".")[:2] | join(".") }}"
+scripts_are_modules = true
+strict = true
+{% endif %}
 {% if uses_ruff %}
 
 [tool.ruff]

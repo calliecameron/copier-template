@@ -51,6 +51,7 @@ file_type_tools:
       - shfmt
     python:
       - ruff
+      - mypy
     javascript:
       - prettier
     html:
@@ -85,6 +86,8 @@ tool_config_file_types:
     shfmt: # .editorconfig
     ruff:
       - toml # pyproject.toml
+    mypy:
+      - toml # pyproject.toml
     markdownlint:
       - json # .markdownlint.json
     tombi:
@@ -107,6 +110,7 @@ tool_installed_by:
     shellcheck: uv
     shfmt:
     ruff: uv
+    mypy: uv
     markdownlint: npm
     tombi: uv
     typos: uv
@@ -329,6 +333,11 @@ uses_shfmt:
 uses_ruff:
   type: bool
   default: "{{ 'ruff' in used_tools }}"
+  when: false
+
+uses_mypy:
+  type: bool
+  default: "{{ 'mypy' in used_tools }}"
   when: false
 
 uses_markdownlint:

@@ -112,6 +112,16 @@ repos:
         types_or: [python, pyi]
         require_serial: true
 {% endif %}
+{% if uses_mypy %}
+  - repo: local
+    hooks:
+      - id: mypy
+        name: "python: typecheck"
+        language: system
+        entry: uv run mypy
+        types_or: [python, pyi]
+        require_serial: true
+{% endif %}
 {% if uses_markdownlint %}
   - repo: local
     hooks:
