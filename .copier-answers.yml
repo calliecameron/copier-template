@@ -1,16 +1,17 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: '7736534'
+_commit: d798547
 _src_path: .
 author_name: Callie Cameron
 copyright_start_year: '2025'
 project_name: Copier template
 project_version: 0.0.0
+python_line_length: 88
 user_has_css: false
 user_has_html: false
 user_has_javascript: false
 user_has_json: false
 user_has_markdown: false
-user_has_python: false
+user_has_python: true
 user_has_shell: true
 user_has_toml: false
 user_has_yaml: false

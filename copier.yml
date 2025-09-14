@@ -50,6 +50,7 @@ file_type_tools:
       - shellcheck
       - shfmt
     python:
+      - ruff
     javascript:
       - prettier
     html:
@@ -82,6 +83,8 @@ tool_config_file_types:
       - json # package.json
     shellcheck: # .shellcheckrc
     shfmt: # .editorconfig
+    ruff:
+      - toml # pyproject.toml
     markdownlint:
       - json # .markdownlint.json
     tombi:
@@ -103,6 +106,7 @@ tool_installed_by:
     prettier: npm
     shellcheck: uv
     shfmt:
+    ruff: uv
     markdownlint: npm
     tombi: uv
     typos: uv
@@ -322,6 +326,11 @@ uses_shfmt:
   default: "{{ 'shfmt' in used_tools }}"
   when: false
 
+uses_ruff:
+  type: bool
+  default: "{{ 'ruff' in used_tools }}"
+  when: false
+
 uses_markdownlint:
   type: bool
   default: "{{ 'markdownlint' in used_tools }}"
@@ -346,3 +355,10 @@ uses_gitlint:
   type: bool
   default: "{{ 'gitlint' in used_tools }}"
   when: false
+
+python_line_length:
+  type: int
+  help: Python line length
+  default: 88 # ruff's default
+  validator: "{% if python_line_length < 80 %}Python line length must be at least 80{% endif %}"
+  when: "{{ has_python }}"

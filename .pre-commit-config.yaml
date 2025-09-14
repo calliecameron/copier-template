@@ -84,6 +84,20 @@ repos:
         name: "shell: format"
   - repo: local
     hooks:
+      - id: ruff-check
+        name: "python: lint"
+        language: system
+        entry: uv run ruff check --force-exclude --fix
+        types_or: [python, pyi]
+        require_serial: true
+      - id: ruff-format
+        name: "python: format"
+        language: system
+        entry: uv run ruff format --force-exclude
+        types_or: [python, pyi]
+        require_serial: true
+  - repo: local
+    hooks:
       - id: markdownlint
         name: "markdown: lint"
         language: system

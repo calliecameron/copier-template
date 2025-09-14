@@ -17,6 +17,9 @@ dev = [
   {% if uses_pre_commit %}
   "pre-commit==4.3.0",
   {% endif %}
+  {% if uses_ruff %}
+  "ruff==0.13.0",
+  {% endif %}
   {% if uses_shellcheck %}
   "shellcheck-py==0.11.0.1",
   {% endif %}
@@ -27,12 +30,36 @@ dev = [
   "typos==1.36.2",
   {% endif %}
 ]
+{% if uses_ruff %}
 
+[tool.ruff]
+line-length = {{ python_line_length }}
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "C90",
+  "D1",
+  "E741",
+  "EM",
+  "FIX",
+  "PLR09",
+  "PTH",
+  "PYI025",
+  "S603",
+  "S607",
+  "T20",
+  "TD",
+  "TRY003",
+  "TRY301",
+]
+{% endif %}
 {% if uses_tombi %}
+
 [tool.tombi]
 {% endif %}
-
 {% if uses_typos %}
+
 [tool.typos]
 files.extend-exclude = [
 {% if uses_copier %}

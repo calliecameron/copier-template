@@ -2,3 +2,4 @@
 /.deps-installed
 /.venv/
 /node_modules/
+/.ruff_cache/

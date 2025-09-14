@@ -4,6 +4,8 @@ import re
 import tomllib
 from collections.abc import Sequence
 
+# ruff: noqa: INP001
+
 
 def extract_dep(dep: str) -> str:
     match = re.match(r"[a-zA-Z0-9_.-]+", dep)
@@ -13,7 +15,7 @@ def extract_dep(dep: str) -> str:
 
 
 def extract_deps(deps: Sequence[str]) -> list[str]:
-    return sorted(set(extract_dep(dep) for dep in deps))
+    return sorted({extract_dep(dep) for dep in deps})
 
 
 def main() -> None:

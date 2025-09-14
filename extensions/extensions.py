@@ -5,6 +5,8 @@ import subprocess
 from jinja2 import Environment, StrictUndefined
 from jinja2.ext import Extension
 
+# ruff: noqa: INP001
+
 
 class StrictUndefinedExtension(Extension):
     def __init__(self, environment: Environment) -> None:
@@ -21,6 +23,7 @@ class GitExtension(Extension):
     def get_git_user_name(default: str) -> str:
         result = subprocess.run(
             ["git", "config", "user.name"],
+            check=False,
             capture_output=True,
             encoding="utf-8",
         )
@@ -42,7 +45,7 @@ class UvExtension(Extension):
                 capture_output=True,
                 check=True,
                 encoding="utf-8",
-            ).stdout
+            ).stdout,
         )
 
         versions = set()
@@ -128,9 +131,9 @@ class ExpandFileTypesExtension(Extension):
         tools = set(always_used_tools)
 
         while True:
-            next = set(current)
+            new = set(current)
 
-            for file_type in next:
+            for file_type in new:
                 tools.update(file_type_tools[file_type] or [])
 
             installers = set()
@@ -141,11 +144,11 @@ class ExpandFileTypesExtension(Extension):
             tools.update(installers)
 
             for tool in tools:
-                next.update(tool_config_file_types[tool] or [])
+                new.update(tool_config_file_types[tool] or [])
 
-            if next == current:
-                return sorted(next)
-            current = next
+            if new == current:
+                return sorted(new)
+            current = new
 
 
 class ExpandToolsExtension(Extension):
@@ -165,15 +168,15 @@ class ExpandToolsExtension(Extension):
             current.update(file_type_tools[file_type] or [])
 
         while True:
-            next = set(current)
+            new = set(current)
 
             installers = set()
-            for tool in next:
+            for tool in new:
                 installed_by = tool_installed_by[tool]
                 if installed_by:
                     installers.add(installed_by)
-            next.update(installers)
+            new.update(installers)
 
-            if next == current:
-                return sorted(next)
-            current = next
+            if new == current:
+                return sorted(new)
+            current = new
