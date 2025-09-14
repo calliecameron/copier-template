@@ -6,9 +6,22 @@ devDependencies: {
 {% if uses_prettier %}
   "prettier": "3.6.2",
 {% endif %}
+{% if uses_stylelint %}
+  "stylelint": "16.24.0",
+  "stylelint-config-standard": "39.0.0",
+{% endif %}
   }
+
 {% if uses_prettier %}
 prettier: {}
 {% endif %}
+
+{% if uses_stylelint %}
+stylelint:
+  extends:
+    - stylelint-config-standard
+  reportNeedlessDisables: true
+{% endif %}
+
 {% endset %}
 {{ content | from_yaml | to_nice_json(indent=2) }}

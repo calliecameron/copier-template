@@ -58,6 +58,7 @@ file_type_tools:
       - prettier
     css:
       - prettier
+      - stylelint
     markdown:
       - prettier
       - markdownlint
@@ -89,6 +90,8 @@ tool_config_file_types:
       - toml # pyproject.toml
     mypy:
       - toml # pyproject.toml
+    stylelint:
+      - json # package.json
     markdownlint:
       - json # .markdownlint.json
     yamllint:
@@ -114,6 +117,7 @@ tool_installed_by:
     shfmt:
     ruff: uv
     mypy: uv
+    stylelint: npm
     markdownlint: npm
     yamllint: uv
     tombi: uv
@@ -342,6 +346,11 @@ uses_ruff:
 uses_mypy:
   type: bool
   default: "{{ 'mypy' in used_tools }}"
+  when: false
+
+uses_stylelint:
+  type: bool
+  default: "{{ 'stylelint' in used_tools }}"
   when: false
 
 uses_markdownlint:

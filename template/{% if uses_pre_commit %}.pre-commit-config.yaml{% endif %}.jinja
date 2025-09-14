@@ -122,6 +122,15 @@ repos:
         types_or: [python, pyi]
         require_serial: true
 {% endif %}
+{% if uses_stylelint %}
+  - repo: local
+    hooks:
+      - id: stylelint
+        name: "css: lint"
+        language: system
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx stylelint --fix "${@}"' --
+        types: [css]
+{% endif %}
 {% if uses_markdownlint %}
   - repo: local
     hooks:

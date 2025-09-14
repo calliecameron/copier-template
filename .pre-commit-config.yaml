@@ -106,6 +106,13 @@ repos:
         require_serial: true
   - repo: local
     hooks:
+      - id: stylelint
+        name: "css: lint"
+        language: system
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx stylelint --fix "${@}"' --
+        types: [css]
+  - repo: local
+    hooks:
       - id: markdownlint
         name: "markdown: lint"
         language: system
