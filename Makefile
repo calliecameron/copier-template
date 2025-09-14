@@ -36,3 +36,5 @@ clean:
 deepclean: clean
 	rm -rf .venv
 	rm -rf node_modules
+	rm -rf .ruff_cache
+	rm -rf .mypy_cache

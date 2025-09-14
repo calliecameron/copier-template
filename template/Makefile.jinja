@@ -56,3 +56,9 @@ deepclean: clean
 {% if uses_npm %}
 	rm -rf node_modules
 {% endif %}
+{% if uses_ruff %}
+	rm -rf .ruff_cache
+{% endif %}
+{% if uses_mypy %}
+	rm -rf .mypy_cache
+{% endif %}
