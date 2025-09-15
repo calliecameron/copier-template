@@ -131,6 +131,15 @@ repos:
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx eslint --fix "${@}"' --
         types: [javascript]
 {% endif %}
+{% if uses_htmlvalidate %}
+  - repo: local
+    hooks:
+      - id: htmlvalidate
+        name: "html: lint"
+        language: system
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx html-validate "${@}"' --
+        types: [html]
+{% endif %}
 {% if uses_stylelint %}
   - repo: local
     hooks:

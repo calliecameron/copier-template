@@ -113,6 +113,13 @@ repos:
         types: [javascript]
   - repo: local
     hooks:
+      - id: htmlvalidate
+        name: "html: lint"
+        language: system
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx html-validate "${@}"' --
+        types: [html]
+  - repo: local
+    hooks:
       - id: stylelint
         name: "css: lint"
         language: system

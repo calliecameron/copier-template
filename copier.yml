@@ -57,6 +57,7 @@ file_type_tools:
       - eslint
     html:
       - prettier
+      - htmlvalidate
     css:
       - prettier
       - stylelint
@@ -93,6 +94,8 @@ tool_config_file_types:
       - toml # pyproject.toml
     eslint:
       - javascript # eslint.config.mjs
+    htmlvalidate:
+      - json # .htmlvalidate.json
     stylelint:
       - json # package.json
     markdownlint:
@@ -121,6 +124,7 @@ tool_installed_by:
     ruff: uv
     mypy: uv
     eslint: npm
+    htmlvalidate: npm
     stylelint: npm
     markdownlint: npm
     yamllint: uv
@@ -355,6 +359,11 @@ uses_mypy:
 uses_eslint:
   type: bool
   default: "{{ 'eslint' in used_tools }}"
+  when: false
+
+uses_htmlvalidate:
+  type: bool
+  default: "{{ 'htmlvalidate' in used_tools }}"
   when: false
 
 uses_stylelint:
