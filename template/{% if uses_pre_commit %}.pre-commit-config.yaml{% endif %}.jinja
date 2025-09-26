@@ -22,6 +22,12 @@ repos:
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
         files: "^(package\\.json|package-lock\\.json)$"
         pass_filenames: false
+      - id: npm-licenses
+        name: "npm: check licenses"
+        language: system
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx license-checker-rseidelsohn --production --failOn "GPL-1.0-only; GPL-1.0-or-later; GPL-2.0-only; GPL-2.0-or-later; GPL-3.0-only; GPL-3.0-or-later; AGPL-1.0-only; AGPL-1.0-or-later; AGPL-3.0-only; AGPL-3.0-or-later"'
+        files: "^(package\\.json|package-lock\\.json)$"
+        pass_filenames: false
 {% endif %}
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
