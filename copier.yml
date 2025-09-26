@@ -103,47 +103,56 @@ config_stage2:
 user_has_shell:
   type: bool
   help: Has shell scripts?
-  default: false
+  default: "{{ 'shell' in config_stage2['file_types'] }}"
+  when: "{{ 'shell' not in config_stage2['file_types'] }}"
 
 user_has_python:
   type: bool
   help: Has python?
-  default: false
+  default: "{{ 'python' in config_stage2['file_types'] }}"
+  when: "{{ 'python' not in config_stage2['file_types'] }}"
 
 user_has_javascript:
   type: bool
   help: Has javascript?
-  default: false
+  default: "{{ 'javascript' in config_stage2['file_types'] }}"
+  when: "{{ 'javascript' not in config_stage2['file_types'] }}"
 
 user_has_html:
   type: bool
   help: Has HTML?
-  default: false
+  default: "{{ 'html' in config_stage2['file_types'] }}"
+  when: "{{ 'html' not in config_stage2['file_types'] }}"
 
 user_has_css:
   type: bool
   help: Has CSS?
-  default: false
+  default: "{{ 'css' in config_stage2['file_types'] }}"
+  when: "{{ 'css' not in config_stage2['file_types'] }}"
 
 user_has_markdown:
   type: bool
   help: Has markdown?
-  default: false
+  default: "{{ 'markdown' in config_stage2['file_types'] }}"
+  when: "{{ 'markdown' not in config_stage2['file_types'] }}"
 
 user_has_json:
   type: bool
   help: Has json?
-  default: false
+  default: "{{ 'json' in config_stage2['file_types'] }}"
+  when: "{{ 'json' not in config_stage2['file_types'] }}"
 
 user_has_yaml:
   type: bool
   help: Has yaml?
-  default: false
+  default: "{{ 'yaml' in config_stage2['file_types'] }}"
+  when: "{{ 'yaml' not in config_stage2['file_types'] }}"
 
 user_has_toml:
   type: bool
   help: Has toml?
-  default: false
+  default: "{{ 'toml' in config_stage2['file_types'] }}"
+  when: "{{ 'toml' not in config_stage2['file_types'] }}"
 
 user_config:
   type: yaml
