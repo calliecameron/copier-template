@@ -5,6 +5,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
 from frozendict import frozendict
+from identify import identify
 from jinja2 import Environment, StrictUndefined
 from jinja2.ext import Extension
 
@@ -111,6 +112,7 @@ class NvmExtension(Extension):
 @dataclass(frozen=True, kw_only=True)
 class FileType:
     tools: frozenset[str]
+    tags: frozenset[str]
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -129,12 +131,23 @@ class ConfigExtension(Extension):
                         "shfmt",
                     },
                 ),
+                tags=frozenset(
+                    {
+                        "shell",
+                    },
+                ),
             ),
             "python": FileType(
                 tools=frozenset(
                     {
                         "ruff",
                         "mypy",
+                    },
+                ),
+                tags=frozenset(
+                    {
+                        "python",
+                        "pyi",
                     },
                 ),
             ),
@@ -145,12 +158,22 @@ class ConfigExtension(Extension):
                         "eslint",
                     },
                 ),
+                tags=frozenset(
+                    {
+                        "javascript",
+                    },
+                ),
             ),
             "html": FileType(
                 tools=frozenset(
                     {
                         "prettier",
                         "htmlvalidate",
+                    },
+                ),
+                tags=frozenset(
+                    {
+                        "html",
                     },
                 ),
             ),
@@ -161,6 +184,11 @@ class ConfigExtension(Extension):
                         "stylelint",
                     },
                 ),
+                tags=frozenset(
+                    {
+                        "css",
+                    },
+                ),
             ),
             "markdown": FileType(
                 tools=frozenset(
@@ -169,11 +197,21 @@ class ConfigExtension(Extension):
                         "markdownlint",
                     },
                 ),
+                tags=frozenset(
+                    {
+                        "markdown",
+                    },
+                ),
             ),
             "json": FileType(
                 tools=frozenset(
                     {
                         "prettier",
+                    },
+                ),
+                tags=frozenset(
+                    {
+                        "json",
                     },
                 ),
             ),
@@ -184,11 +222,21 @@ class ConfigExtension(Extension):
                         "yamllint",
                     },
                 ),
+                tags=frozenset(
+                    {
+                        "yaml",
+                    },
+                ),
             ),
             "toml": FileType(
                 tools=frozenset(
                     {
                         "tombi",
+                    },
+                ),
+                tags=frozenset(
+                    {
+                        "toml",
                     },
                 ),
             ),
@@ -338,6 +386,7 @@ class ConfigExtension(Extension):
     def __init__(self, environment: Environment) -> None:
         super().__init__(environment)
         environment.filters["expand_config"] = ConfigExtension.expand_config
+        environment.filters["detect_config"] = ConfigExtension.detect_config
 
     @staticmethod
     def expand_config(
@@ -374,3 +423,28 @@ class ConfigExtension(Extension):
 
             current_file_types = new_file_types
             current_tools = new_tools
+
+    @staticmethod
+    def detect_config(_: str) -> dict[str, list[str]]:
+        files = sorted(
+            subprocess.run(
+                ["git", "ls-files", "--cached", "--others", "--exclude-standard"],
+                capture_output=True,
+                check=True,
+                encoding="utf-8",
+            )
+            .stdout.strip()
+            .splitlines(),
+        )
+
+        file_types = set()
+
+        for file in files:
+            tags = identify.tags_from_path(file)
+            for file_type, data in ConfigExtension._FILE_TYPES.items():
+                if data.tags & tags:
+                    file_types.add(file_type)
+
+        return {
+            "file_types": sorted(file_types),
+        }

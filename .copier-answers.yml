@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: 69b02d4
+_commit: 7ae9845
 _src_path: .
 author_name: Callie Cameron
 copyright_start_year: '2025'
@@ -8,6 +8,3 @@ project_version: 0.0.0
 python_line_length: 88
 user_has_css: true
 user_has_html: true
-user_has_javascript: true
-user_has_python: true
-user_has_shell: true

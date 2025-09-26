@@ -89,10 +89,9 @@ copyright_end_year:
   default: "{{ '%Y' | strftime }}"
   when: false
 
-# TODO: actually detect
 detected_config:
   type: yaml
-  default: {}
+  default: "{{ '' | detect_config }}"
   when: false
 
 config_stage2:
