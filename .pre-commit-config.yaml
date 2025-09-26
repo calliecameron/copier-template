@@ -13,6 +13,14 @@ repos:
         name: "uv: sync"
   - repo: local
     hooks:
+      - id: uv-licenses
+        name: "uv: check licenses"
+        language: system
+        entry: uv run licensecheck --zero --requirements-paths pyproject.toml
+        files: "^(pyproject\\.toml|uv\\.lock)$"
+        pass_filenames: false
+  - repo: local
+    hooks:
       - id: npm-lock
         name: "npm: sync"
         language: system

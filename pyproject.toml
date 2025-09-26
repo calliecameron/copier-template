@@ -2,6 +2,8 @@
 name = "copier-template"
 version = "0.0.0"
 requires-python = "==3.13.7"
+license = "MIT"
+license-files = ["LICENSE"]
 dependencies = []
 
 [dependency-groups]
@@ -12,6 +14,7 @@ dev = [
   "frozendict==2.4.6",
   "gitlint==0.19.1",
   "identify==2.6.14",
+  "licensecheck==2025.1.0",
   "mypy==1.18.2",
   "pre-commit==4.3.0",
   "ruff==0.13.2",

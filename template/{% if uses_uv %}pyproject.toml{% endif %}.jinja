@@ -2,6 +2,8 @@
 name = "{{ project_name | slugify }}"
 version = "{{ project_version }}"
 requires-python = "=={{ python_version }}"
+license = "MIT"
+license-files = ["LICENSE"]
 dependencies = []
 
 [dependency-groups]
@@ -18,6 +20,7 @@ dev = [
   {% if uses_copier %}
   "identify==2.6.14",
   {% endif %}
+  "licensecheck==2025.1.0",
   {% if uses_mypy %}
   "mypy==1.18.2",
   {% endif %}
