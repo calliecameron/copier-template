@@ -274,42 +274,12 @@ class ConfigExtension(Extension):
         },
     )
 
-    _ALWAYS_EXISTING_FILE_TYPES = frozenset(
-        {
-            "markdown",  # README.md
-            "json",  # .vscode/settings.json
-        },
-    )
-
-    _ALWAYS_USED_TOOLS = frozenset(
-        {
-            "uv",
-            "copier",
-            "pre-commit",
-            "typos",
-            "gitleaks",
-            "gitlint",
-        },
-    )
-
     def __init__(self, environment: Environment) -> None:
         super().__init__(environment)
         environment.filters["expand_config"] = ConfigExtension.expand_config
 
     @staticmethod
     def expand_config(
-        file_types: list[str] | None,
-    ) -> dict[str, list[str]]:
-        return ConfigExtension._expand_config(
-            file_types or [],
-            {
-                "file_types": sorted(ConfigExtension._ALWAYS_EXISTING_FILE_TYPES),
-                "tools": sorted(ConfigExtension._ALWAYS_USED_TOOLS),
-            },
-        )
-
-    @staticmethod
-    def _expand_config(
         file_types: list[str],
         existing: Mapping[str, Sequence[str]],
     ) -> dict[str, list[str]]:

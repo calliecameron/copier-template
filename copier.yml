@@ -32,6 +32,21 @@ _tasks:
   - command: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
     when: "{{ uses_npm }}"
 
+base_config:
+  type: yaml
+  default:
+    file_types:
+      - markdown # README.md
+      - json # .vscode/settings.json
+    tools:
+      - uv
+      - copier
+      - pre-commit
+      - typos
+      - gitleaks
+      - gitlint
+  when: false
+
 python_version:
   type: str
   default: "{{ '' | get_python_version }}"
@@ -148,7 +163,7 @@ user_file_types:
 
 config:
   type: yaml
-  default: "{{ user_file_types | expand_config }}"
+  default: "{{ user_file_types | expand_config(base_config) }}"
   when: false
 
 has_shell:
