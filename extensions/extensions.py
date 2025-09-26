@@ -1,6 +1,7 @@
 import json
 import re
 import subprocess
+from collections.abc import Mapping, Sequence
 
 from frozendict import frozendict
 from jinja2 import Environment, StrictUndefined
@@ -293,58 +294,50 @@ class ConfigExtension(Extension):
 
     def __init__(self, environment: Environment) -> None:
         super().__init__(environment)
-        environment.filters["expand_file_types"] = ConfigExtension.expand_file_types
-        environment.filters["expand_tools"] = ConfigExtension.expand_tools
+        environment.filters["expand_config"] = ConfigExtension.expand_config
 
     @staticmethod
-    def expand_file_types(
-        user_file_types: list[str] | None,
-    ) -> list[str]:
-        current = set(user_file_types or [])
-        current.update(ConfigExtension._ALWAYS_EXISTING_FILE_TYPES)
-        for tool in ConfigExtension._ALWAYS_USED_TOOLS:
-            current.update(ConfigExtension._TOOL_CONFIG_FILE_TYPES[tool])
-
-        tools = set(ConfigExtension._ALWAYS_USED_TOOLS)
-
-        while True:
-            new = set(current)
-
-            for file_type in new:
-                tools.update(ConfigExtension._FILE_TYPE_TOOLS[file_type])
-
-            installers = set()
-            for tool in tools:
-                installed_by = ConfigExtension._TOOL_INSTALLED_BY[tool]
-                if installed_by:
-                    installers.add(installed_by)
-            tools.update(installers)
-
-            for tool in tools:
-                new.update(ConfigExtension._TOOL_CONFIG_FILE_TYPES[tool])
-
-            if new == current:
-                return sorted(new)
-            current = new
+    def expand_config(
+        file_types: list[str] | None,
+    ) -> dict[str, list[str]]:
+        return ConfigExtension._expand_config(
+            file_types or [],
+            {
+                "file_types": sorted(ConfigExtension._ALWAYS_EXISTING_FILE_TYPES),
+                "tools": sorted(ConfigExtension._ALWAYS_USED_TOOLS),
+            },
+        )
 
     @staticmethod
-    def expand_tools(
+    def _expand_config(
         file_types: list[str],
-    ) -> list[str]:
-        current = set(ConfigExtension._ALWAYS_USED_TOOLS)
-        for file_type in file_types:
-            current.update(ConfigExtension._FILE_TYPE_TOOLS[file_type] or frozenset())
+        existing: Mapping[str, Sequence[str]],
+    ) -> dict[str, list[str]]:
+        current_file_types = set(existing["file_types"]) | set(file_types)
+        current_tools = set(existing["tools"])
 
         while True:
-            new = set(current)
+            new_file_types = set(current_file_types)
+            new_tools = set(current_tools)
+
+            for file_type in new_file_types:
+                new_tools.update(ConfigExtension._FILE_TYPE_TOOLS[file_type])
 
             installers = set()
-            for tool in new:
+            for tool in new_tools:
                 installed_by = ConfigExtension._TOOL_INSTALLED_BY[tool]
                 if installed_by:
                     installers.add(installed_by)
-            new.update(installers)
+            new_tools.update(installers)
 
-            if new == current:
-                return sorted(new)
-            current = new
+            for tool in new_tools:
+                new_file_types.update(ConfigExtension._TOOL_CONFIG_FILE_TYPES[tool])
+
+            if new_file_types == current_file_types and new_tools == current_tools:
+                return {
+                    "file_types": sorted(new_file_types),
+                    "tools": sorted(new_tools),
+                }
+
+            current_file_types = new_file_types
+            current_tools = new_tools

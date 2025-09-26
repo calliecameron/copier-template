@@ -146,149 +146,144 @@ user_file_types:
     {% endif %}
   when: false
 
-file_types:
+config:
   type: yaml
-  default: "{{ user_file_types | expand_file_types }}"
+  default: "{{ user_file_types | expand_config }}"
   when: false
 
 has_shell:
   type: bool
-  default: "{{ 'shell' in file_types }}"
+  default: "{{ 'shell' in config['file_types'] }}"
   when: false
 
 has_python:
   type: bool
-  default: "{{ 'python' in file_types }}"
+  default: "{{ 'python' in config['file_types'] }}"
   when: false
 
 has_javascript:
   type: bool
-  default: "{{ 'javascript' in file_types }}"
+  default: "{{ 'javascript' in config['file_types'] }}"
   when: false
 
 has_html:
   type: bool
-  default: "{{ 'html' in file_types }}"
+  default: "{{ 'html' in config['file_types'] }}"
   when: false
 
 has_css:
   type: bool
-  default: "{{ 'css' in file_types }}"
+  default: "{{ 'css' in config['file_types'] }}"
   when: false
 
 has_markdown:
   type: bool
-  default: "{{ 'markdown' in file_types }}"
+  default: "{{ 'markdown' in config['file_types'] }}"
   when: false
 
 has_json:
   type: bool
-  default: "{{ 'json' in file_types }}"
+  default: "{{ 'json' in config['file_types'] }}"
   when: false
 
 has_yaml:
   type: bool
-  default: "{{ 'yaml' in file_types }}"
+  default: "{{ 'yaml' in config['file_types'] }}"
   when: false
 
 has_toml:
   type: bool
-  default: "{{ 'toml' in file_types }}"
-  when: false
-
-used_tools:
-  type: yaml
-  default: "{{ file_types | expand_tools }}"
+  default: "{{ 'toml' in config['file_types'] }}"
   when: false
 
 uses_uv:
   type: bool
-  default: "{{ 'uv' in used_tools }}"
+  default: "{{ 'uv' in config['tools'] }}"
   when: false
 
 uses_copier:
   type: bool
-  default: "{{ 'copier' in used_tools }}"
+  default: "{{ 'copier' in config['tools'] }}"
   when: false
 
 uses_pre_commit:
   type: bool
-  default: "{{ 'pre-commit' in used_tools }}"
+  default: "{{ 'pre-commit' in config['tools'] }}"
   when: false
 
 uses_npm:
   type: bool
-  default: "{{ 'npm' in used_tools }}"
+  default: "{{ 'npm' in config['tools'] }}"
   when: false
 
 uses_prettier:
   type: bool
-  default: "{{ 'prettier' in used_tools }}"
+  default: "{{ 'prettier' in config['tools'] }}"
   when: false
 
 uses_shellcheck:
   type: bool
-  default: "{{ 'shellcheck' in used_tools }}"
+  default: "{{ 'shellcheck' in config['tools'] }}"
   when: false
 
 uses_shfmt:
   type: bool
-  default: "{{ 'shfmt' in used_tools }}"
+  default: "{{ 'shfmt' in config['tools'] }}"
   when: false
 
 uses_ruff:
   type: bool
-  default: "{{ 'ruff' in used_tools }}"
+  default: "{{ 'ruff' in config['tools'] }}"
   when: false
 
 uses_mypy:
   type: bool
-  default: "{{ 'mypy' in used_tools }}"
+  default: "{{ 'mypy' in config['tools'] }}"
   when: false
 
 uses_eslint:
   type: bool
-  default: "{{ 'eslint' in used_tools }}"
+  default: "{{ 'eslint' in config['tools'] }}"
   when: false
 
 uses_htmlvalidate:
   type: bool
-  default: "{{ 'htmlvalidate' in used_tools }}"
+  default: "{{ 'htmlvalidate' in config['tools'] }}"
   when: false
 
 uses_stylelint:
   type: bool
-  default: "{{ 'stylelint' in used_tools }}"
+  default: "{{ 'stylelint' in config['tools'] }}"
   when: false
 
 uses_markdownlint:
   type: bool
-  default: "{{ 'markdownlint' in used_tools }}"
+  default: "{{ 'markdownlint' in config['tools'] }}"
   when: false
 
 uses_yamllint:
   type: bool
-  default: "{{ 'yamllint' in used_tools }}"
+  default: "{{ 'yamllint' in config['tools'] }}"
   when: false
 
 uses_tombi:
   type: bool
-  default: "{{ 'tombi' in used_tools }}"
+  default: "{{ 'tombi' in config['tools'] }}"
   when: false
 
 uses_typos:
   type: bool
-  default: "{{ 'typos' in used_tools }}"
+  default: "{{ 'typos' in config['tools'] }}"
   when: false
 
 uses_gitleaks:
   type: bool
-  default: "{{ 'gitleaks' in used_tools }}"
+  default: "{{ 'gitleaks' in config['tools'] }}"
   when: false
 
 uses_gitlint:
   type: bool
-  default: "{{ 'gitlint' in used_tools }}"
+  default: "{{ 'gitlint' in config['tools'] }}"
   when: false
 
 python_line_length:
