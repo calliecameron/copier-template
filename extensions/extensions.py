@@ -280,11 +280,13 @@ class ConfigExtension(Extension):
 
     @staticmethod
     def expand_config(
-        file_types: list[str],
+        new: Mapping[str, Sequence[str]],
         existing: Mapping[str, Sequence[str]],
     ) -> dict[str, list[str]]:
-        current_file_types = set(existing["file_types"]) | set(file_types)
-        current_tools = set(existing["tools"])
+        current_file_types = set(existing.get("file_types", [])) | set(
+            new.get("file_types", []),
+        )
+        current_tools = set(existing.get("tools", [])) | set(new.get("tools", []))
 
         while True:
             new_file_types = set(current_file_types)

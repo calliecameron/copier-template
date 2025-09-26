@@ -47,6 +47,11 @@ base_config:
       - gitlint
   when: false
 
+config_stage1:
+  type: yaml
+  default: "{{ base_config | expand_config({}) }}"
+  when: false
+
 python_version:
   type: str
   default: "{{ '' | get_python_version }}"
@@ -82,6 +87,17 @@ copyright_start_year:
 copyright_end_year:
   type: str
   default: "{{ '%Y' | strftime }}"
+  when: false
+
+# TODO: actually detect
+detected_config:
+  type: yaml
+  default: {}
+  when: false
+
+config_stage2:
+  type: yaml
+  default: "{{ detected_config | expand_config(config_stage1) }}"
   when: false
 
 user_has_shell:
@@ -129,41 +145,42 @@ user_has_toml:
   help: Has toml?
   default: false
 
-user_file_types:
+user_config:
   type: yaml
   default: |
-    {% if user_has_shell %}
-    - shell
-    {% endif %}
-    {% if user_has_python %}
-    - python
-    {% endif %}
-    {% if user_has_javascript %}
-    - javascript
-    {% endif %}
-    {% if user_has_html %}
-    - html
-    {% endif %}
-    {% if user_has_css %}
-    - css
-    {% endif %}
-    {% if user_has_markdown %}
-    - markdown
-    {% endif %}
-    {% if user_has_json %}
-    - json
-    {% endif %}
-    {% if user_has_yaml %}
-    - yaml
-    {% endif %}
-    {% if user_has_toml %}
-    - toml
-    {% endif %}
+    file_types:
+      {% if user_has_shell %}
+      - shell
+      {% endif %}
+      {% if user_has_python %}
+      - python
+      {% endif %}
+      {% if user_has_javascript %}
+      - javascript
+      {% endif %}
+      {% if user_has_html %}
+      - html
+      {% endif %}
+      {% if user_has_css %}
+      - css
+      {% endif %}
+      {% if user_has_markdown %}
+      - markdown
+      {% endif %}
+      {% if user_has_json %}
+      - json
+      {% endif %}
+      {% if user_has_yaml %}
+      - yaml
+      {% endif %}
+      {% if user_has_toml %}
+      - toml
+      {% endif %}
   when: false
 
 config:
   type: yaml
-  default: "{{ user_file_types | expand_config(base_config) }}"
+  default: "{{ user_config | expand_config(config_stage2) }}"
   when: false
 
 has_shell:
