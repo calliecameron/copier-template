@@ -2,6 +2,7 @@ import json
 import re
 import subprocess
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 
 from frozendict import frozendict
 from jinja2 import Environment, StrictUndefined
@@ -107,170 +108,230 @@ class NvmExtension(Extension):
         )
 
 
+@dataclass(frozen=True, kw_only=True)
+class FileType:
+    tools: frozenset[str]
+
+
+@dataclass(frozen=True, kw_only=True)
+class Tool:
+    config_file_types: frozenset[str]
+    installed_by: str | None
+
+
 class ConfigExtension(Extension):
-    _FILE_TYPE_TOOLS: frozendict[str, frozenset[str]] = frozendict(
+    _FILE_TYPES: frozendict[str, FileType] = frozendict(
         {
-            "shell": frozenset(
-                {
-                    "shellcheck",
-                    "shfmt",
-                },
+            "shell": FileType(
+                tools=frozenset(
+                    {
+                        "shellcheck",
+                        "shfmt",
+                    },
+                ),
             ),
-            "python": frozenset(
-                {
-                    "ruff",
-                    "mypy",
-                },
+            "python": FileType(
+                tools=frozenset(
+                    {
+                        "ruff",
+                        "mypy",
+                    },
+                ),
             ),
-            "javascript": frozenset(
-                {
-                    "prettier",
-                    "eslint",
-                },
+            "javascript": FileType(
+                tools=frozenset(
+                    {
+                        "prettier",
+                        "eslint",
+                    },
+                ),
             ),
-            "html": frozenset(
-                {
-                    "prettier",
-                    "htmlvalidate",
-                },
+            "html": FileType(
+                tools=frozenset(
+                    {
+                        "prettier",
+                        "htmlvalidate",
+                    },
+                ),
             ),
-            "css": frozenset(
-                {
-                    "prettier",
-                    "stylelint",
-                },
+            "css": FileType(
+                tools=frozenset(
+                    {
+                        "prettier",
+                        "stylelint",
+                    },
+                ),
             ),
-            "markdown": frozenset(
-                {
-                    "prettier",
-                    "markdownlint",
-                },
+            "markdown": FileType(
+                tools=frozenset(
+                    {
+                        "prettier",
+                        "markdownlint",
+                    },
+                ),
             ),
-            "json": frozenset(
-                {
-                    "prettier",
-                },
+            "json": FileType(
+                tools=frozenset(
+                    {
+                        "prettier",
+                    },
+                ),
             ),
-            "yaml": frozenset(
-                {
-                    "prettier",
-                    "yamllint",
-                },
+            "yaml": FileType(
+                tools=frozenset(
+                    {
+                        "prettier",
+                        "yamllint",
+                    },
+                ),
             ),
-            "toml": frozenset(
-                {
-                    "tombi",
-                },
+            "toml": FileType(
+                tools=frozenset(
+                    {
+                        "tombi",
+                    },
+                ),
             ),
         },
     )
 
-    _TOOL_CONFIG_FILE_TYPES: frozendict[str, frozenset[str]] = frozendict(
+    _TOOLS: frozendict[str, Tool] = frozendict(
         {
-            "uv": frozenset(
-                {
-                    # also .python-version, uv.lock
-                    "toml",  # pyproject.toml
-                },
+            "uv": Tool(
+                config_file_types=frozenset(
+                    {
+                        # also .python-version, uv.lock
+                        "toml",  # pyproject.toml
+                    },
+                ),
+                installed_by=None,
             ),
-            "copier": frozenset(
-                {
-                    "yaml",  # .copier-answers.yml
-                },
+            "copier": Tool(
+                config_file_types=frozenset(
+                    {
+                        "yaml",  # .copier-answers.yml
+                    },
+                ),
+                installed_by="uv",
             ),
-            "pre-commit": frozenset(
-                {
-                    "yaml",  # .pre-commit-config.yaml
-                },
+            "pre-commit": Tool(
+                config_file_types=frozenset(
+                    {
+                        "yaml",  # .pre-commit-config.yaml
+                    },
+                ),
+                installed_by="uv",
             ),
-            "npm": frozenset(
-                {
-                    # also .nvmrc, .npmrc
-                    "json",  # package.json, package-lock.json
-                },
+            "npm": Tool(
+                config_file_types=frozenset(
+                    {
+                        # also .nvmrc, .npmrc
+                        "json",  # package.json, package-lock.json
+                    },
+                ),
+                installed_by=None,
             ),
-            "prettier": frozenset(
-                {
-                    # also .prettierignore
-                    "json",  # package.json
-                },
+            "prettier": Tool(
+                config_file_types=frozenset(
+                    {
+                        # also .prettierignore
+                        "json",  # package.json
+                    },
+                ),
+                installed_by="npm",
             ),
-            "shellcheck": frozenset(),  # .shellcheckrc
-            "shfmt": frozenset(),  # .editorconfig
-            "ruff": frozenset(
-                {
-                    "toml",  # pyproject.toml
-                },
+            "shellcheck": Tool(
+                config_file_types=frozenset(),  # .shellcheckrc
+                installed_by="uv",
             ),
-            "mypy": frozenset(
-                {
-                    "toml",  # pyproject.toml
-                },
+            "shfmt": Tool(
+                config_file_types=frozenset(),  # .editorconfig
+                installed_by=None,
             ),
-            "eslint": frozenset(
-                {
-                    "javascript",  # eslint.config.mjs
-                },
+            "ruff": Tool(
+                config_file_types=frozenset(
+                    {
+                        "toml",  # pyproject.toml
+                    },
+                ),
+                installed_by="uv",
             ),
-            "htmlvalidate": frozenset(
-                {
-                    "json",  # .htmlvalidate.json
-                },
+            "mypy": Tool(
+                config_file_types=frozenset(
+                    {
+                        "toml",  # pyproject.toml
+                    },
+                ),
+                installed_by="uv",
             ),
-            "stylelint": frozenset(
-                {
-                    "json",  # package.json
-                },
+            "eslint": Tool(
+                config_file_types=frozenset(
+                    {
+                        "javascript",  # eslint.config.mjs
+                    },
+                ),
+                installed_by="npm",
             ),
-            "markdownlint": frozenset(
-                {
-                    "json",  # .markdownlint.json
-                },
+            "htmlvalidate": Tool(
+                config_file_types=frozenset(
+                    {
+                        "json",  # .htmlvalidate.json
+                    },
+                ),
+                installed_by="npm",
             ),
-            "yamllint": frozenset(
-                {
-                    "yaml",  # .yamllint.yml
-                },
+            "stylelint": Tool(
+                config_file_types=frozenset(
+                    {
+                        "json",  # package.json
+                    },
+                ),
+                installed_by="npm",
             ),
-            "tombi": frozenset(
-                {
-                    "toml",  # pyproject.toml
-                },
+            "markdownlint": Tool(
+                config_file_types=frozenset(
+                    {
+                        "json",  # .markdownlint.json
+                    },
+                ),
+                installed_by="npm",
             ),
-            "typos": frozenset(
-                {
-                    "toml",  # pyproject.toml
-                },
+            "yamllint": Tool(
+                config_file_types=frozenset(
+                    {
+                        "yaml",  # .yamllint.yml
+                    },
+                ),
+                installed_by="uv",
             ),
-            "gitleaks": frozenset(
-                {
-                    "toml",  # .gitleaks.toml
-                },
+            "tombi": Tool(
+                config_file_types=frozenset(
+                    {
+                        "toml",  # pyproject.toml
+                    },
+                ),
+                installed_by="uv",
             ),
-            "gitlint": frozenset(),  # .gitlint
-        },
-    )
-
-    _TOOL_INSTALLED_BY: frozendict[str, str | None] = frozendict(
-        {
-            "uv": None,
-            "copier": "uv",
-            "pre-commit": "uv",
-            "npm": None,
-            "prettier": "npm",
-            "shellcheck": "uv",
-            "shfmt": None,
-            "ruff": "uv",
-            "mypy": "uv",
-            "eslint": "npm",
-            "htmlvalidate": "npm",
-            "stylelint": "npm",
-            "markdownlint": "npm",
-            "yamllint": "uv",
-            "tombi": "uv",
-            "typos": "uv",
-            "gitleaks": None,
-            "gitlint": "uv",
+            "typos": Tool(
+                config_file_types=frozenset(
+                    {
+                        "toml",  # pyproject.toml
+                    },
+                ),
+                installed_by="uv",
+            ),
+            "gitleaks": Tool(
+                config_file_types=frozenset(
+                    {
+                        "toml",  # .gitleaks.toml
+                    },
+                ),
+                installed_by=None,
+            ),
+            "gitlint": Tool(
+                config_file_types=frozenset(),  # .gitlint
+                installed_by="uv",
+            ),
         },
     )
 
@@ -293,17 +354,17 @@ class ConfigExtension(Extension):
             new_tools = set(current_tools)
 
             for file_type in new_file_types:
-                new_tools.update(ConfigExtension._FILE_TYPE_TOOLS[file_type])
+                new_tools.update(ConfigExtension._FILE_TYPES[file_type].tools)
 
             installers = set()
             for tool in new_tools:
-                installed_by = ConfigExtension._TOOL_INSTALLED_BY[tool]
+                installed_by = ConfigExtension._TOOLS[tool].installed_by
                 if installed_by:
                     installers.add(installed_by)
             new_tools.update(installers)
 
             for tool in new_tools:
-                new_file_types.update(ConfigExtension._TOOL_CONFIG_FILE_TYPES[tool])
+                new_file_types.update(ConfigExtension._TOOLS[tool].config_file_types)
 
             if new_file_types == current_file_types and new_tools == current_tools:
                 return {
