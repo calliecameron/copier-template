@@ -2,6 +2,7 @@ import json
 import re
 import subprocess
 
+from frozendict import frozendict
 from jinja2 import Environment, StrictUndefined
 from jinja2.ext import Extension
 
@@ -105,19 +106,181 @@ class NvmExtension(Extension):
         )
 
 
-class ExpandFileTypesExtension(Extension):
+class ConfigExtension(Extension):
+    _FILE_TYPE_TOOLS: frozendict[str, frozenset[str]] = frozendict(
+        {
+            "shell": frozenset(
+                {
+                    "shellcheck",
+                    "shfmt",
+                },
+            ),
+            "python": frozenset(
+                {
+                    "ruff",
+                    "mypy",
+                },
+            ),
+            "javascript": frozenset(
+                {
+                    "prettier",
+                    "eslint",
+                },
+            ),
+            "html": frozenset(
+                {
+                    "prettier",
+                    "htmlvalidate",
+                },
+            ),
+            "css": frozenset(
+                {
+                    "prettier",
+                    "stylelint",
+                },
+            ),
+            "markdown": frozenset(
+                {
+                    "prettier",
+                    "markdownlint",
+                },
+            ),
+            "json": frozenset(
+                {
+                    "prettier",
+                },
+            ),
+            "yaml": frozenset(
+                {
+                    "prettier",
+                    "yamllint",
+                },
+            ),
+            "toml": frozenset(
+                {
+                    "tombi",
+                },
+            ),
+        },
+    )
+
+    _TOOL_CONFIG_FILE_TYPES: frozendict[str, frozenset[str]] = frozendict(
+        {
+            "uv": frozenset(
+                {
+                    # also .python-version, uv.lock
+                    "toml",  # pyproject.toml
+                },
+            ),
+            "copier": frozenset(
+                {
+                    "yaml",  # .copier-answers.yml
+                },
+            ),
+            "pre-commit": frozenset(
+                {
+                    "yaml",  # .pre-commit-config.yaml
+                },
+            ),
+            "npm": frozenset(
+                {
+                    # also .nvmrc, .npmrc
+                    "json",  # package.json, package-lock.json
+                },
+            ),
+            "prettier": frozenset(
+                {
+                    # also .prettierignore
+                    "json",  # package.json
+                },
+            ),
+            "shellcheck": frozenset(),  # .shellcheckrc
+            "shfmt": frozenset(),  # .editorconfig
+            "ruff": frozenset(
+                {
+                    "toml",  # pyproject.toml
+                },
+            ),
+            "mypy": frozenset(
+                {
+                    "toml",  # pyproject.toml
+                },
+            ),
+            "eslint": frozenset(
+                {
+                    "javascript",  # eslint.config.mjs
+                },
+            ),
+            "htmlvalidate": frozenset(
+                {
+                    "json",  # .htmlvalidate.json
+                },
+            ),
+            "stylelint": frozenset(
+                {
+                    "json",  # package.json
+                },
+            ),
+            "markdownlint": frozenset(
+                {
+                    "json",  # .markdownlint.json
+                },
+            ),
+            "yamllint": frozenset(
+                {
+                    "yaml",  # .yamllint.yml
+                },
+            ),
+            "tombi": frozenset(
+                {
+                    "toml",  # pyproject.toml
+                },
+            ),
+            "typos": frozenset(
+                {
+                    "toml",  # pyproject.toml
+                },
+            ),
+            "gitleaks": frozenset(
+                {
+                    "toml",  # .gitleaks.toml
+                },
+            ),
+            "gitlint": frozenset(),  # .gitlint
+        },
+    )
+
+    _TOOL_INSTALLED_BY: frozendict[str, str | None] = frozendict(
+        {
+            "uv": None,
+            "copier": "uv",
+            "pre-commit": "uv",
+            "npm": None,
+            "prettier": "npm",
+            "shellcheck": "uv",
+            "shfmt": None,
+            "ruff": "uv",
+            "mypy": "uv",
+            "eslint": "npm",
+            "htmlvalidate": "npm",
+            "stylelint": "npm",
+            "markdownlint": "npm",
+            "yamllint": "uv",
+            "tombi": "uv",
+            "typos": "uv",
+            "gitleaks": None,
+            "gitlint": "uv",
+        },
+    )
+
     def __init__(self, environment: Environment) -> None:
         super().__init__(environment)
-        environment.filters["expand_file_types"] = (
-            ExpandFileTypesExtension.expand_file_types
-        )
+        environment.filters["expand_file_types"] = ConfigExtension.expand_file_types
+        environment.filters["expand_tools"] = ConfigExtension.expand_tools
 
     @staticmethod
     def expand_file_types(
         user_file_types: list[str] | None,
-        file_type_tools: dict[str, list[str] | None],
-        tool_config_file_types: dict[str, list[str] | None],
-        tool_installed_by: dict[str, str | None],
         always_existing_file_types: list[str] | None,
         always_used_tools: list[str] | None,
     ) -> list[str]:
@@ -126,7 +289,7 @@ class ExpandFileTypesExtension(Extension):
         current = set(user_file_types or [])
         current.update(always_existing_file_types or [])
         for tool in always_used_tools:
-            current.update(tool_config_file_types[tool] or [])
+            current.update(ConfigExtension._TOOL_CONFIG_FILE_TYPES[tool])
 
         tools = set(always_used_tools)
 
@@ -134,45 +297,37 @@ class ExpandFileTypesExtension(Extension):
             new = set(current)
 
             for file_type in new:
-                tools.update(file_type_tools[file_type] or [])
+                tools.update(ConfigExtension._FILE_TYPE_TOOLS[file_type])
 
             installers = set()
             for tool in tools:
-                installed_by = tool_installed_by[tool]
+                installed_by = ConfigExtension._TOOL_INSTALLED_BY[tool]
                 if installed_by:
                     installers.add(installed_by)
             tools.update(installers)
 
             for tool in tools:
-                new.update(tool_config_file_types[tool] or [])
+                new.update(ConfigExtension._TOOL_CONFIG_FILE_TYPES[tool])
 
             if new == current:
                 return sorted(new)
             current = new
 
-
-class ExpandToolsExtension(Extension):
-    def __init__(self, environment: Environment) -> None:
-        super().__init__(environment)
-        environment.filters["expand_tools"] = ExpandToolsExtension.expand_tools
-
     @staticmethod
     def expand_tools(
         file_types: list[str],
-        file_type_tools: dict[str, list[str] | None],
-        tool_installed_by: dict[str, str | None],
         always_used_tools: list[str] | None,
     ) -> list[str]:
         current = set(always_used_tools or [])
         for file_type in file_types:
-            current.update(file_type_tools[file_type] or [])
+            current.update(ConfigExtension._FILE_TYPE_TOOLS[file_type] or frozenset())
 
         while True:
             new = set(current)
 
             installers = set()
             for tool in new:
-                installed_by = tool_installed_by[tool]
+                installed_by = ConfigExtension._TOOL_INSTALLED_BY[tool]
                 if installed_by:
                     installers.add(installed_by)
             new.update(installers)

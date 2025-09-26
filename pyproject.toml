@@ -9,6 +9,7 @@ dev = [
   "cookiecutter==2.6.0",
   "copier==9.10.2",
   "copier-template-extensions==0.3.3",
+  "frozendict==2.4.6",
   "gitlint==0.19.1",
   "mypy==1.18.2",
   "pre-commit==4.3.0",

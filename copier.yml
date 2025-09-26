@@ -10,8 +10,7 @@ _jinja_extensions:
   - extensions/extensions.py:GitExtension
   - extensions/extensions.py:UvExtension
   - extensions/extensions.py:NvmExtension
-  - extensions/extensions.py:ExpandFileTypesExtension
-  - extensions/extensions.py:ExpandToolsExtension
+  - extensions/extensions.py:ConfigExtension
 _subdirectory: template
 _message_after_copy: |
 
@@ -41,97 +40,6 @@ python_version:
 node_version:
   type: str
   default: "{{ '' | get_node_version }}"
-  when: false
-
-file_type_tools:
-  type: yaml
-  default:
-    shell:
-      - shellcheck
-      - shfmt
-    python:
-      - ruff
-      - mypy
-    javascript:
-      - prettier
-      - eslint
-    html:
-      - prettier
-      - htmlvalidate
-    css:
-      - prettier
-      - stylelint
-    markdown:
-      - prettier
-      - markdownlint
-    json:
-      - prettier
-    yaml:
-      - prettier
-      - yamllint
-    toml:
-      - tombi
-  when: false
-
-tool_config_file_types:
-  type: yaml
-  default:
-    uv: # also .python-version, uv.lock
-      - toml # pyproject.toml
-    copier:
-      - yaml # .copier-answers.yml
-    pre-commit:
-      - yaml # .pre-commit-config.yaml
-    npm: # also .nvmrc, .npmrc
-      - json # package.json, package-lock.json
-    prettier: # also .prettierignore
-      - json # package.json
-    shellcheck: # .shellcheckrc
-    shfmt: # .editorconfig
-    ruff:
-      - toml # pyproject.toml
-    mypy:
-      - toml # pyproject.toml
-    eslint:
-      - javascript # eslint.config.mjs
-    htmlvalidate:
-      - json # .htmlvalidate.json
-    stylelint:
-      - json # package.json
-    markdownlint:
-      - json # .markdownlint.json
-    yamllint:
-      - yaml # .yamllint.yml
-    tombi:
-      - toml # pyproject.toml
-    typos:
-      - toml # pyproject.toml
-    gitleaks:
-      - toml # .gitleaks.toml
-    gitlint: # .gitlint
-  when: false
-
-tool_installed_by:
-  type: yaml
-  default:
-    uv:
-    copier: uv
-    pre-commit: uv
-    npm:
-    prettier: npm
-    shellcheck: uv
-    shfmt:
-    ruff: uv
-    mypy: uv
-    eslint: npm
-    htmlvalidate: npm
-    stylelint: npm
-    markdownlint: npm
-    yamllint: uv
-    tombi: uv
-    typos: uv
-    gitleaks:
-    gitlint: uv
   when: false
 
 always_existing_file_types:
@@ -258,7 +166,7 @@ user_file_types:
 
 file_types:
   type: yaml
-  default: "{{ user_file_types | expand_file_types(file_type_tools, tool_config_file_types, tool_installed_by, always_existing_file_types, always_used_tools) }}"
+  default: "{{ user_file_types | expand_file_types(always_existing_file_types, always_used_tools) }}"
   when: false
 
 has_shell:
@@ -308,7 +216,7 @@ has_toml:
 
 used_tools:
   type: yaml
-  default: "{{ file_types | expand_tools(file_type_tools, tool_installed_by, always_used_tools) }}"
+  default: "{{ file_types | expand_tools(always_used_tools) }}"
   when: false
 
 uses_uv:
