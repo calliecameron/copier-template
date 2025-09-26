@@ -76,7 +76,8 @@ repos:
         name: "general: prettier"
         language: system
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx prettier --write --ignore-unknown "${@}"' --
-        types: [text]
+        types_or:
+          - text
 {% endif %}
 {% if uses_shellcheck %}
   - repo: local
@@ -85,8 +86,12 @@ repos:
         name: "shell: lint"
         language: system
         entry: uv run shellcheck
-        types: [shell]
-        exclude_types: [zsh]
+        types_or:
+{% for tag in file_type_tags["shell"] %}
+          - {{ tag }}
+{% endfor %}
+        exclude_types:
+          - zsh
         require_serial: true
 {% endif %}
 {% if uses_shfmt %}
@@ -103,13 +108,19 @@ repos:
         name: "python: lint"
         language: system
         entry: uv run ruff check --force-exclude --fix
-        types_or: [python, pyi]
+        types_or:
+{% for tag in file_type_tags["python"] %}
+          - {{ tag }}
+{% endfor %}
         require_serial: true
       - id: ruff-format
         name: "python: format"
         language: system
         entry: uv run ruff format --force-exclude
-        types_or: [python, pyi]
+        types_or:
+{% for tag in file_type_tags["python"] %}
+          - {{ tag }}
+{% endfor %}
         require_serial: true
 {% endif %}
 {% if uses_mypy %}
@@ -119,7 +130,10 @@ repos:
         name: "python: typecheck"
         language: system
         entry: uv run mypy
-        types_or: [python, pyi]
+        types_or:
+{% for tag in file_type_tags["python"] %}
+          - {{ tag }}
+{% endfor %}
         require_serial: true
 {% endif %}
 {% if uses_eslint %}
@@ -129,7 +143,10 @@ repos:
         name: "javascript: lint"
         language: system
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx eslint --fix "${@}"' --
-        types: [javascript]
+        types_or:
+{% for tag in file_type_tags["javascript"] %}
+          - {{ tag }}
+{% endfor %}
 {% endif %}
 {% if uses_htmlvalidate %}
   - repo: local
@@ -138,7 +155,10 @@ repos:
         name: "html: lint"
         language: system
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx html-validate "${@}"' --
-        types: [html]
+        types_or:
+{% for tag in file_type_tags["html"] %}
+          - {{ tag }}
+{% endfor %}
 {% endif %}
 {% if uses_stylelint %}
   - repo: local
@@ -147,7 +167,10 @@ repos:
         name: "css: lint"
         language: system
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx stylelint --fix "${@}"' --
-        types: [css]
+        types_or:
+{% for tag in file_type_tags["css"] %}
+          - {{ tag }}
+{% endfor %}
 {% endif %}
 {% if uses_markdownlint %}
   - repo: local
@@ -156,7 +179,10 @@ repos:
         name: "markdown: lint"
         language: system
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx markdownlint-cli2 --fix "${@}"' --
-        types: [markdown]
+        types_or:
+{% for tag in file_type_tags["markdown"] %}
+          - {{ tag }}
+{% endfor %}
 {% endif %}
 {% if uses_yamllint %}
   - repo: local
@@ -165,7 +191,10 @@ repos:
         name: "yaml: lint"
         language: system
         entry: uv run yamllint --strict
-        types: [yaml]
+        types_or:
+{% for tag in file_type_tags["yaml"] %}
+          - {{ tag }}
+{% endfor %}
 {% endif %}
 {% if uses_tombi %}
   - repo: local
@@ -174,12 +203,18 @@ repos:
         name: "toml: lint"
         language: system
         entry: uv run tombi lint
-        types: [toml]
+        types_or:
+{% for tag in file_type_tags["toml"] %}
+          - {{ tag }}
+{% endfor %}
       - id: tombi-format
         name: "toml: format"
         language: system
         entry: uv run tombi format
-        types: [toml]
+        types_or:
+{% for tag in file_type_tags["toml"] %}
+          - {{ tag }}
+{% endfor %}
 {% endif %}
 {% if uses_typos %}
   - repo: local
@@ -188,7 +223,8 @@ repos:
         name: "general: spellcheck"
         language: system
         entry: uv run typos --write-changes --force-exclude
-        types: [text]
+        types_or:
+          - text
 {% endif %}
 {% if uses_gitleaks %}
   - repo: https://github.com/gitleaks/gitleaks
@@ -204,5 +240,6 @@ repos:
         name: "general: check commit message"
         language: system
         entry: uv run gitlint --staged --msg-filename
-        stages: [commit-msg]
+        stages:
+          - commit-msg
 {% endif %}

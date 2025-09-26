@@ -387,6 +387,7 @@ class ConfigExtension(Extension):
         super().__init__(environment)
         environment.filters["expand_config"] = ConfigExtension.expand_config
         environment.filters["detect_config"] = ConfigExtension.detect_config
+        environment.filters["file_type_tags"] = ConfigExtension.file_type_tags
 
     @staticmethod
     def expand_config(
@@ -447,4 +448,11 @@ class ConfigExtension(Extension):
 
         return {
             "file_types": sorted(file_types),
+        }
+
+    @staticmethod
+    def file_type_tags(_: str) -> dict[str, list[str]]:
+        return {
+            file_type: sorted(data.tags)
+            for file_type, data in ConfigExtension._FILE_TYPES.items()
         }

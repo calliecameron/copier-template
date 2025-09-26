@@ -32,6 +32,11 @@ _tasks:
   - command: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
     when: "{{ uses_npm }}"
 
+file_type_tags:
+  type: yaml
+  default: "{{ '' | file_type_tags }}"
+  when: false
+
 base_config:
   type: yaml
   default:
