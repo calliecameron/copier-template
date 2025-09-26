@@ -42,24 +42,6 @@ node_version:
   default: "{{ '' | get_node_version }}"
   when: false
 
-always_existing_file_types:
-  type: yaml
-  default:
-    - markdown # README.md
-    - json # .vscode/settings.json
-  when: false
-
-always_used_tools:
-  type: yaml
-  default:
-    - uv
-    - copier
-    - pre-commit
-    - typos
-    - gitleaks
-    - gitlint
-  when: false
-
 project_name:
   type: str
   help: Project name
@@ -166,7 +148,7 @@ user_file_types:
 
 file_types:
   type: yaml
-  default: "{{ user_file_types | expand_file_types(always_existing_file_types, always_used_tools) }}"
+  default: "{{ user_file_types | expand_file_types }}"
   when: false
 
 has_shell:
@@ -216,7 +198,7 @@ has_toml:
 
 used_tools:
   type: yaml
-  default: "{{ file_types | expand_tools(always_used_tools) }}"
+  default: "{{ file_types | expand_tools }}"
   when: false
 
 uses_uv:

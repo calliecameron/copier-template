@@ -273,6 +273,24 @@ class ConfigExtension(Extension):
         },
     )
 
+    _ALWAYS_EXISTING_FILE_TYPES = frozenset(
+        {
+            "markdown",  # README.md
+            "json",  # .vscode/settings.json
+        },
+    )
+
+    _ALWAYS_USED_TOOLS = frozenset(
+        {
+            "uv",
+            "copier",
+            "pre-commit",
+            "typos",
+            "gitleaks",
+            "gitlint",
+        },
+    )
+
     def __init__(self, environment: Environment) -> None:
         super().__init__(environment)
         environment.filters["expand_file_types"] = ConfigExtension.expand_file_types
@@ -281,17 +299,13 @@ class ConfigExtension(Extension):
     @staticmethod
     def expand_file_types(
         user_file_types: list[str] | None,
-        always_existing_file_types: list[str] | None,
-        always_used_tools: list[str] | None,
     ) -> list[str]:
-        always_used_tools = always_used_tools or []
-
         current = set(user_file_types or [])
-        current.update(always_existing_file_types or [])
-        for tool in always_used_tools:
+        current.update(ConfigExtension._ALWAYS_EXISTING_FILE_TYPES)
+        for tool in ConfigExtension._ALWAYS_USED_TOOLS:
             current.update(ConfigExtension._TOOL_CONFIG_FILE_TYPES[tool])
 
-        tools = set(always_used_tools)
+        tools = set(ConfigExtension._ALWAYS_USED_TOOLS)
 
         while True:
             new = set(current)
@@ -316,9 +330,8 @@ class ConfigExtension(Extension):
     @staticmethod
     def expand_tools(
         file_types: list[str],
-        always_used_tools: list[str] | None,
     ) -> list[str]:
-        current = set(always_used_tools or [])
+        current = set(ConfigExtension._ALWAYS_USED_TOOLS)
         for file_type in file_types:
             current.update(ConfigExtension._FILE_TYPE_TOOLS[file_type] or frozenset())
 
