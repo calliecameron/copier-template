@@ -553,6 +553,38 @@ class ConfigExtension(Extension):
                 ),
                 installed_by=None,
             ),
+            "github-actions": Tool(
+                config_file_types=frozenset(
+                    {
+                        "yaml",  # .github/workflows/*.yml
+                    },
+                ),
+                installed_by=None,
+                requires=frozenset(
+                    {
+                        "actionlint",
+                        "zizmor",
+                    },
+                ),
+                file_regexes=frozenset(
+                    {
+                        r"\.github/workflows/.*.yml",
+                    },
+                ),
+            ),
+            "actionlint": Tool(
+                config_file_types=frozenset(),
+                installed_by=None,
+            ),
+            "zizmor": Tool(
+                config_file_types=frozenset(),
+                installed_by="uv",
+                python_packages=frozendict(
+                    {
+                        "zizmor": "1.14.1",
+                    },
+                ),
+            ),
             "gitlint": Tool(
                 config_file_types=frozenset(),  # .gitlint
                 installed_by="uv",

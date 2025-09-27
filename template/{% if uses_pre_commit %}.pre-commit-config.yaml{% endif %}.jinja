@@ -253,6 +253,23 @@ repos:
       - id: gitleaks
         name: "general: check for committed secrets"
 {% endif %}
+{% if uses_actionlint %}
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.7
+    hooks:
+      - id: actionlint
+        name: "github actions: lint"
+{% endif %}
+{% if uses_zizmor %}
+  - repo: local
+    hooks:
+      - id: zizmor
+        name: "github actions: security"
+        language: system
+        entry: uv run zizmor --pedantic --no-progress
+        files: "^\\.github/workflows/.*\\.ya?ml$"
+        require_serial: true
+{% endif %}
   - repo: local
     hooks:
       - id: tests

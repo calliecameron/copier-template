@@ -188,6 +188,12 @@ user_has_toml:
   default: "{{ 'toml' in config_stage2['file_types'] }}"
   when: "{{ 'toml' not in config_stage2['file_types'] }}"
 
+user_uses_github_actions:
+  type: bool
+  help: Uses github actions?
+  default: "{{ 'github-actions' in config_stage2['tools'] }}"
+  when: "{{ 'github-actions' not in config_stage2['tools'] }}"
+
 user_config:
   type: yaml
   default: |
@@ -225,6 +231,9 @@ user_config:
       {% endif %}
       {% if user_uses_pytest %}
       - pytest
+      {% endif %}
+      {% if user_uses_github_actions %}
+      - github-actions
       {% endif %}
   when: false
 
@@ -391,6 +400,21 @@ uses_typos:
 uses_gitleaks:
   type: bool
   default: "{{ 'gitleaks' in config['tools'] }}"
+  when: false
+
+uses_github_actions:
+  type: bool
+  default: "{{ 'github-actions' in config['tools'] }}"
+  when: false
+
+uses_actionlint:
+  type: bool
+  default: "{{ 'actionlint' in config['tools'] }}"
+  when: false
+
+uses_zizmor:
+  type: bool
+  default: "{{ 'zizmor' in config['tools'] }}"
   when: false
 
 uses_gitlint:
