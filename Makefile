@@ -5,8 +5,8 @@ all: lint test
 deps: .deps-installed
 
 .deps-installed: pyproject.toml uv.lock package.json package-lock.json
-	./.template_scripts/uv_install_deps.sh
-	./.template_scripts/npm_install_deps.sh
+	./.template_scripts/uv_install_deps
+	./.template_scripts/npm_install_deps
 	uv run pre-commit install -f
 	touch .deps-installed
 
@@ -19,8 +19,8 @@ test: deps
 
 .PHONY: update_deps
 update_deps: deps
-	./.template_scripts/uv_update_deps.sh
-	./.template_scripts/npm_update_deps.sh
+	./.template_scripts/uv_update_deps
+	./.template_scripts/npm_update_deps
 	uv run pre-commit autoupdate
 
 .PHONY: update_template
