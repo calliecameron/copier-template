@@ -194,6 +194,12 @@ user_uses_github_actions:
   default: "{{ 'github-actions' in config_stage2['tools'] }}"
   when: "{{ 'github-actions' not in config_stage2['tools'] }}"
 
+github_repo:
+  type: str
+  help: GitHub repo (in the form '<user>/<repo>')
+  validator: "{% if github_repo.split('/') | length != 2 %}GitHub repo must be in the form '<user>/<repo>'{% endif %}"
+  when: "{{ user_uses_github_actions }}"
+
 user_config:
   type: yaml
   default: |

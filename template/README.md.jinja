@@ -6,3 +6,6 @@
 {% if uses_pre_commit %}
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 {% endif %}
+{% if uses_github_actions %}
+[![CI](https://github.com/{{ github_repo }}/actions/workflows/ci.yml/badge.svg)](https://github.com/{{ github_repo }}/actions/workflows/ci.yml)
+{% endif %}
