@@ -17,5 +17,7 @@ jobs:
         uses: astral-sh/setup-uv@b75a909f75acd358c2196fb9a5f1299a9a8868a4 # v6.7.0
         with:
           version: "0.8.22"
+      - name: Install node
+        run: nvm install
       - name: Test
         run: make ci
