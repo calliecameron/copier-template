@@ -106,6 +106,9 @@ ignore = [
   "INP001",
 {% endif %}
   "PLR09",
+{% if uses_pytest %}
+  "PT011",
+{% endif %}
   "PTH",
   "PYI025",
   "S603",

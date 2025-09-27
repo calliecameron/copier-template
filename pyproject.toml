@@ -55,6 +55,7 @@ ignore = [
   "FIX",
   "INP001",
   "PLR09",
+  "PT011",
   "PTH",
   "PYI025",
   "S603",
