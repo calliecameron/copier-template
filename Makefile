@@ -5,15 +5,15 @@ all: precommit
 deps: .deps-installed
 
 .deps-installed: pyproject.toml uv.lock package.json package-lock.json
-	./.template_scripts/uv_install_deps
-	./.template_scripts/npm_install_deps
+	./.template_files/uv_install_deps
+	./.template_files/npm_install_deps
 	uv run pre-commit install -f
 	touch .deps-installed
 
 .PHONY: deps_update
 deps_update: deps
-	./.template_scripts/uv_update_deps
-	./.template_scripts/npm_update_deps
+	./.template_files/uv_update_deps
+	./.template_files/npm_update_deps
 	uv run pre-commit autoupdate
 
 .PHONY: precommit
@@ -26,7 +26,7 @@ ci: precommit test_slow
 # Fast tests are run by pre-commit
 .PHONY: test_fast
 test_fast: deps
-	./.template_scripts/bats -r tests
+	./.template_files/bats -r tests
 	uv run pytest tests
 
 # Slow tests are only run in CI
