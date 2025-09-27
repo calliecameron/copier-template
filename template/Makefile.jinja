@@ -83,3 +83,6 @@ deepclean: clean
 {% if uses_mypy %}
 	rm -rf .mypy_cache
 {% endif %}
+{% if uses_pytest %}
+	rm -rf .pytest_cache
+{% endif %}
