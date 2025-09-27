@@ -10,8 +10,6 @@ from identify import identify
 from jinja2 import Environment, StrictUndefined
 from jinja2.ext import Extension
 
-# ruff: noqa: INP001
-
 
 class StrictUndefinedExtension(Extension):
     def __init__(self, environment: Environment) -> None:

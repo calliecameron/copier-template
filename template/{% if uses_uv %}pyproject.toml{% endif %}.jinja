@@ -102,6 +102,9 @@ ignore = [
   "E741",
   "EM",
   "FIX",
+{% if not is_python_package %}
+  "INP001",
+{% endif %}
   "PLR09",
   "PTH",
   "PYI025",
