@@ -247,6 +247,13 @@ repos:
       - id: gitleaks
         name: "general: check for committed secrets"
 {% endif %}
+  - repo: local
+    hooks:
+      - id: tests
+        name: "general: tests"
+        language: system
+        entry: make test_fast
+        pass_filenames: false
 {% if uses_gitlint %}
   - repo: local
     hooks:

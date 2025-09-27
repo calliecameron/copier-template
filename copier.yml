@@ -17,14 +17,14 @@ _message_after_copy: |
   ------
   Template applied successfully. Run 'make' to verify.
 
-  You may also want to run 'make update_deps' in case the versions installed by
+  You may also want to run 'make deps_update' in case the versions installed by
   the template are outdated.
 _message_after_update: |
 
   ------
   Template applied successfully. Run 'make' to verify.
 
-  You may also want to run 'make update_deps' in case the versions installed by
+  You may also want to run 'make deps_update' in case the versions installed by
   the template are outdated.
 _tasks:
   - command: uv lock

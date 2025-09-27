@@ -1,5 +1,5 @@
 .PHONY: all
-all: lint test
+all: precommit
 
 .PHONY: deps
 deps: .deps-installed
@@ -10,21 +10,33 @@ deps: .deps-installed
 	uv run pre-commit install -f
 	touch .deps-installed
 
-.PHONY: lint
-lint: deps
-	uv run pre-commit run -a
-
-.PHONY: test
-test: deps
-
-.PHONY: update_deps
-update_deps: deps
+.PHONY: deps_update
+deps_update: deps
 	./.template_scripts/uv_update_deps
 	./.template_scripts/npm_update_deps
 	uv run pre-commit autoupdate
 
-.PHONY: update_template
-update_template: deps
+.PHONY: precommit
+precommit: deps
+	uv run pre-commit run -a
+
+.PHONY: ci
+ci: precommit test_slow
+
+# Fast tests are run by pre-commit
+.PHONY: test_fast
+test_fast: deps
+
+# Slow tests are only run in CI
+.PHONY: test_slow
+test_slow: deps
+
+.PHONY: template_reapply
+template_reapply: deps
+	uv run copier update --trust --vcs-ref=:current:
+
+.PHONY: template_update
+template_update: deps
 	uv run copier update --trust
 
 .PHONY: clean
