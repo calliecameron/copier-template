@@ -72,6 +72,11 @@ project_name:
   help: Project name
   validator: "{% if not project_name %}Project name must not be empty{% endif %}"
 
+project_name_slug:
+  type: str
+  default: "{{ project_name | slugify }}"
+  when: false
+
 project_version:
   type: str
   help: Project version
@@ -121,6 +126,19 @@ user_has_python:
   help: Has python?
   default: "{{ 'python' in config_stage2['file_types'] }}"
   when: "{{ 'python' not in config_stage2['file_types'] }}"
+
+is_python_package:
+  type: bool
+  help: Is python package? (No for standalone scripts)
+  default: false
+  when: "{{ user_has_python }}"
+
+python_line_length:
+  type: int
+  help: Python line length
+  default: 88 # ruff's default
+  validator: "{% if python_line_length < 80 %}Python line length must be at least 80{% endif %}"
+  when: "{{ user_has_python }}"
 
 user_uses_pytest:
   type: bool
@@ -360,9 +378,7 @@ uses_gitlint:
   default: "{{ 'gitlint' in config['tools'] }}"
   when: false
 
-python_line_length:
-  type: int
-  help: Python line length
-  default: 88 # ruff's default
-  validator: "{% if python_line_length < 80 %}Python line length must be at least 80{% endif %}"
-  when: "{{ has_python }}"
+has_test_dir:
+  type: bool
+  default: "{{ uses_bats or uses_pytest }}"
+  when: false

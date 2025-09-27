@@ -26,14 +26,16 @@ dev = [
 ]
 
 [tool.mypy]
+explicit_package_bases = true
 mypy_path = "stubs"
-namespace_packages = false
+namespace_packages = true
 pretty = true
 python_version = "3.13"
 scripts_are_modules = true
 strict = true
 
 [tool.pytest.ini_options]
+pythonpath = ["."]
 
 [tool.ruff]
 line-length = 88
