@@ -60,6 +60,26 @@ class TestUvExtension:
         with pytest.raises(ValueError):
             UvExtension.get_python_version("")
 
+    def test_get_python_packages(self, fp: FakeProcess) -> None:
+        fp.register(
+            ["uv", "pip", "list", "--format=json"],
+            '[{"name": "foo"}, {"name": "bar"}]',
+        )
+        assert UvExtension.get_python_packages() == frozenset({"foo", "bar"})
+
+    def test_get_python_packages_fails(self, fp: FakeProcess) -> None:
+        fp.register(
+            ["uv", "pip", "list", "--format=json"],
+            "",
+        )
+        assert UvExtension.get_python_packages() == frozenset()
+
+        fp.register(
+            ["uv", "pip", "list", "--format=json"],
+            returncode=1,
+        )
+        assert UvExtension.get_python_packages() == frozenset()
+
 
 class TestNvmExtension:
     def test_get_node_version_existing(
@@ -80,6 +100,38 @@ class TestNvmExtension:
             stdout="v24.5.0",
         )
         assert NvmExtension.get_node_version("") == "v24.5.0"
+
+    def test_get_node_packages(self, fp: FakeProcess) -> None:
+        fp.register(
+            [
+                "bash",
+                "-c",
+                'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm list --json',
+            ],
+            '{"dependencies": {"foo": {}, "bar": {}}}',
+        )
+        assert NvmExtension.get_node_packages() == frozenset({"foo", "bar"})
+
+    def test_get_node_packages_fails(self, fp: FakeProcess) -> None:
+        fp.register(
+            [
+                "bash",
+                "-c",
+                'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm list --json',
+            ],
+            "",
+        )
+        assert NvmExtension.get_node_packages() == frozenset()
+
+        fp.register(
+            [
+                "bash",
+                "-c",
+                'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm list --json',
+            ],
+            returncode=1,
+        )
+        assert NvmExtension.get_node_packages() == frozenset()
 
 
 class TestConfigExtension:
@@ -173,10 +225,22 @@ class TestConfigExtension:
                 "conftest.py",
             ],
         )
+        fp.register(
+            ["uv", "pip", "list", "--format=json"],
+            '[{"name": "mypy"}]',
+        )
+        fp.register(
+            [
+                "bash",
+                "-c",
+                'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm list --json',
+            ],
+            '{"dependencies": {"prettier": {}}}',
+        )
 
         assert ConfigExtension.detect_config("") == {
             "file_types": ["python", "shell"],
-            "tools": ["bats", "pytest"],
+            "tools": ["bats", "mypy", "prettier", "pytest"],
         }
 
     def test_file_type_tags(self) -> None:
