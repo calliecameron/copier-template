@@ -441,7 +441,10 @@ class ConfigExtension(Extension):
         file_types = set()
 
         for file in files:
-            tags = identify.tags_from_path(file)
+            try:
+                tags = identify.tags_from_path(file)
+            except ValueError:
+                continue
             for file_type, data in ConfigExtension._FILE_TYPES.items():
                 if data.tags & tags:
                     file_types.add(file_type)
