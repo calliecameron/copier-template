@@ -147,10 +147,10 @@ class FileType:
 class Tool:
     config_file_types: frozenset[str]
     installed_by: str | None
-    detect_tags: frozenset[str] = frozenset()
-    detect_file_regexes: frozenset[str] = frozenset()
-    detect_python_packages: frozenset[str] = frozenset()
-    detect_node_packages: frozenset[str] = frozenset()
+    tags: frozenset[str] = frozenset()
+    file_regexes: frozenset[str] = frozenset()
+    python_packages: frozenset[str] = frozenset()
+    node_packages: frozenset[str] = frozenset()
 
 
 class ConfigExtension(Extension):
@@ -295,7 +295,7 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="uv",
-                detect_python_packages=frozenset(
+                python_packages=frozenset(
                     {
                         "copier",
                     },
@@ -308,7 +308,7 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="uv",
-                detect_python_packages=frozenset(
+                python_packages=frozenset(
                     {
                         "pre-commit",
                     },
@@ -332,7 +332,7 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="npm",
-                detect_node_packages=frozenset(
+                node_packages=frozenset(
                     {
                         "prettier",
                     },
@@ -341,7 +341,7 @@ class ConfigExtension(Extension):
             "shellcheck": Tool(
                 config_file_types=frozenset(),  # .shellcheckrc
                 installed_by="uv",
-                detect_python_packages=frozenset(
+                python_packages=frozenset(
                     {
                         "shellcheck-py",
                     },
@@ -358,12 +358,12 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="npm",
-                detect_tags=frozenset(
+                tags=frozenset(
                     {
                         "bats",
                     },
                 ),
-                detect_node_packages=frozenset(
+                node_packages=frozenset(
                     {
                         "bats",
                     },
@@ -376,7 +376,7 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="uv",
-                detect_python_packages=frozenset(
+                python_packages=frozenset(
                     {
                         "ruff",
                     },
@@ -389,7 +389,7 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="uv",
-                detect_python_packages=frozenset(
+                python_packages=frozenset(
                     {
                         "mypy",
                     },
@@ -402,12 +402,12 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="uv",
-                detect_file_regexes=frozenset(
+                file_regexes=frozenset(
                     {
                         r"(.*/)?conftest\.py",
                     },
                 ),
-                detect_python_packages=frozenset(
+                python_packages=frozenset(
                     {
                         "pytest",
                     },
@@ -420,7 +420,7 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="npm",
-                detect_node_packages=frozenset(
+                node_packages=frozenset(
                     {
                         "eslint",
                     },
@@ -433,7 +433,7 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="npm",
-                detect_node_packages=frozenset(
+                node_packages=frozenset(
                     {
                         "html-validate",
                     },
@@ -446,7 +446,7 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="npm",
-                detect_node_packages=frozenset(
+                node_packages=frozenset(
                     {
                         "stylelint",
                     },
@@ -459,7 +459,7 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="npm",
-                detect_node_packages=frozenset(
+                node_packages=frozenset(
                     {
                         "markdownlint-cli2",
                     },
@@ -472,7 +472,7 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="uv",
-                detect_python_packages=frozenset(
+                python_packages=frozenset(
                     {
                         "yamllint",
                     },
@@ -485,7 +485,7 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="uv",
-                detect_python_packages=frozenset(
+                python_packages=frozenset(
                     {
                         "tombi",
                     },
@@ -498,7 +498,7 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="uv",
-                detect_python_packages=frozenset(
+                python_packages=frozenset(
                     {
                         "typos",
                     },
@@ -515,7 +515,7 @@ class ConfigExtension(Extension):
             "gitlint": Tool(
                 config_file_types=frozenset(),  # .gitlint
                 installed_by="uv",
-                detect_python_packages=frozenset(
+                python_packages=frozenset(
                     {
                         "gitlint",
                     },
@@ -599,14 +599,14 @@ class ConfigExtension(Extension):
 
             for tool, tool_data in ConfigExtension._TOOLS.items():
                 if (
-                    tool_data.detect_tags & tags
-                    or tool_data.detect_python_packages & python_packages
-                    or tool_data.detect_node_packages & node_packages
+                    tool_data.tags & tags
+                    or tool_data.python_packages & python_packages
+                    or tool_data.node_packages & node_packages
                 ):
                     tools.add(tool)
                     continue
 
-                for regex in tool_data.detect_file_regexes:
+                for regex in tool_data.file_regexes:
                     if re.fullmatch(regex, file) is not None:
                         tools.add(tool)
 
