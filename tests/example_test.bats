@@ -5,7 +5,7 @@ setup() {
     bats_load_library 'bats-assert'
 }
 
-@test "dummy" {
+@test "example" {
     run true
     assert_success
 }
