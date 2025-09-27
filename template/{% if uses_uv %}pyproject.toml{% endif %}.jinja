@@ -27,6 +27,9 @@ dev = [
   {% if uses_pre_commit %}
   "pre-commit==4.3.0",
   {% endif %}
+  {% if uses_pytest %}
+  "pytest==8.4.2",
+  {% endif %}
   {% if uses_ruff %}
   "ruff==0.13.2",
   {% endif %}
@@ -52,6 +55,10 @@ pretty = true
 python_version = "{{ python_version.split(".")[:2] | join(".") }}"
 scripts_are_modules = true
 strict = true
+{% endif %}
+{% if uses_pytest %}
+
+[tool.pytest.ini_options]
 {% endif %}
 {% if uses_ruff %}
 

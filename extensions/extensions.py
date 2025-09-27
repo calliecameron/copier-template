@@ -3,6 +3,7 @@ import re
 import subprocess
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from pathlib import PurePath
 
 from frozendict import frozendict
 from identify import identify
@@ -316,6 +317,14 @@ class ConfigExtension(Extension):
                 ),
                 installed_by="uv",
             ),
+            "pytest": Tool(
+                config_file_types=frozenset(
+                    {
+                        "toml",  # pyproject.toml
+                    },
+                ),
+                installed_by="uv",
+            ),
             "eslint": Tool(
                 config_file_types=frozenset(
                     {
@@ -458,6 +467,9 @@ class ConfigExtension(Extension):
 
             if "bats" in tags:
                 tools.add("bats")
+
+            if PurePath(file).name == "conftest.py":
+                tools.add("pytest")
 
         return {
             "file_types": sorted(file_types),

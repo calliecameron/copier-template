@@ -27,6 +27,7 @@ ci: precommit test_slow
 .PHONY: test_fast
 test_fast: deps
 	./.template_scripts/bats -r tests
+	uv run pytest tests
 
 # Slow tests are only run in CI
 .PHONY: test_slow

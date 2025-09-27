@@ -17,6 +17,7 @@ dev = [
   "licensecheck==2025.1.0",
   "mypy==1.18.2",
   "pre-commit==4.3.0",
+  "pytest==8.4.2",
   "ruff==0.13.2",
   "shellcheck-py==0.11.0.1",
   "tombi==0.6.17",
@@ -31,6 +32,8 @@ pretty = true
 python_version = "3.13"
 scripts_are_modules = true
 strict = true
+
+[tool.pytest.ini_options]
 
 [tool.ruff]
 line-length = 88

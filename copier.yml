@@ -122,6 +122,12 @@ user_has_python:
   default: "{{ 'python' in config_stage2['file_types'] }}"
   when: "{{ 'python' not in config_stage2['file_types'] }}"
 
+user_uses_pytest:
+  type: bool
+  help: Uses pytest?
+  default: "{{ 'pytest' in config_stage2['tools'] }}"
+  when: "{{ user_has_python and 'pytest' not in config_stage2['tools'] }}"
+
 user_has_javascript:
   type: bool
   help: Has javascript?
@@ -198,6 +204,9 @@ user_config:
     tools:
       {% if user_uses_bats %}
       - bats
+      {% endif %}
+      {% if user_uses_pytest %}
+      - pytest
       {% endif %}
   when: false
 
@@ -299,6 +308,11 @@ uses_ruff:
 uses_mypy:
   type: bool
   default: "{{ 'mypy' in config['tools'] }}"
+  when: false
+
+uses_pytest:
+  type: bool
+  default: "{{ 'pytest' in config['tools'] }}"
   when: false
 
 uses_eslint:

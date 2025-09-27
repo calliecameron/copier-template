@@ -43,6 +43,9 @@ test_fast: deps
 {% if uses_bats %}
 	./.template_scripts/bats -r tests
 {% endif %}
+{% if uses_pytest %}
+	uv run pytest tests
+{% endif %}
 
 # Slow tests are only run in CI
 .PHONY: test_slow
