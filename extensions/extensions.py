@@ -3,7 +3,6 @@ import re
 import subprocess
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from pathlib import PurePath
 
 from frozendict import frozendict
 from identify import identify
@@ -11,14 +10,14 @@ from jinja2 import Environment, StrictUndefined
 from jinja2.ext import Extension
 
 
-class StrictUndefinedExtension(Extension):
+class StrictUndefinedExtension(Extension):  # pragma: no cover
     def __init__(self, environment: Environment) -> None:
         super().__init__(environment)
         environment.undefined = StrictUndefined
 
 
 class GitExtension(Extension):
-    def __init__(self, environment: Environment) -> None:
+    def __init__(self, environment: Environment) -> None:  # pragma: no cover
         super().__init__(environment)
         environment.filters["get_git_user_name"] = GitExtension.get_git_user_name
 
@@ -36,7 +35,7 @@ class GitExtension(Extension):
 
 
 class UvExtension(Extension):
-    def __init__(self, environment: Environment) -> None:
+    def __init__(self, environment: Environment) -> None:  # pragma: no cover
         super().__init__(environment)
         environment.filters["get_python_version"] = UvExtension.get_python_version
 
@@ -79,7 +78,7 @@ class UvExtension(Extension):
 
 
 class NvmExtension(Extension):
-    def __init__(self, environment: Environment) -> None:
+    def __init__(self, environment: Environment) -> None:  # pragma: no cover
         super().__init__(environment)
         environment.filters["get_node_version"] = NvmExtension.get_node_version
 
@@ -118,6 +117,8 @@ class FileType:
 class Tool:
     config_file_types: frozenset[str]
     installed_by: str | None
+    detect_tags: frozenset[str] = frozenset()
+    detect_file_regexes: frozenset[str] = frozenset()
 
 
 class ConfigExtension(Extension):
@@ -305,6 +306,11 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="npm",
+                detect_tags=frozenset(
+                    {
+                        "bats",
+                    },
+                ),
             ),
             "ruff": Tool(
                 config_file_types=frozenset(
@@ -329,6 +335,11 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="uv",
+                detect_file_regexes=frozenset(
+                    {
+                        r"(.*/)?conftest\.py",
+                    },
+                ),
             ),
             "eslint": Tool(
                 config_file_types=frozenset(
@@ -401,7 +412,7 @@ class ConfigExtension(Extension):
         },
     )
 
-    def __init__(self, environment: Environment) -> None:
+    def __init__(self, environment: Environment) -> None:  # pragma: no cover
         super().__init__(environment)
         environment.filters["expand_config"] = ConfigExtension.expand_config
         environment.filters["detect_config"] = ConfigExtension.detect_config
@@ -466,15 +477,18 @@ class ConfigExtension(Extension):
                 tags = identify.tags_from_path(file)
             except ValueError:
                 continue
-            for file_type, data in ConfigExtension._FILE_TYPES.items():
-                if data.tags & tags:
+
+            for file_type, file_type_data in ConfigExtension._FILE_TYPES.items():
+                if file_type_data.tags & tags:
                     file_types.add(file_type)
 
-            if "bats" in tags:
-                tools.add("bats")
+            for tool, tool_data in ConfigExtension._TOOLS.items():
+                if tool_data.detect_tags & tags:
+                    tools.add(tool)
 
-            if PurePath(file).name == "conftest.py":
-                tools.add("pytest")
+                for regex in tool_data.detect_file_regexes:
+                    if re.fullmatch(regex, file) is not None:
+                        tools.add(tool)
 
         return {
             "file_types": sorted(file_types),
