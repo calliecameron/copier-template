@@ -18,6 +18,6 @@ jobs:
         with:
           version: "0.8.22"
       - name: Install node
-        run: nvm install
+        run: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm install'
       - name: Test
         run: make ci
