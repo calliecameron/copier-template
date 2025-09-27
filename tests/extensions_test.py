@@ -108,6 +108,16 @@ class TestNvmExtension:
                 "-c",
                 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm list --json',
             ],
+            "{}",
+        )
+        assert NvmExtension.get_node_packages() == frozenset()
+
+        fp.register(
+            [
+                "bash",
+                "-c",
+                'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm list --json',
+            ],
             '{"dependencies": {"foo": {}, "bar": {}}}',
         )
         assert NvmExtension.get_node_packages() == frozenset({"foo", "bar"})

@@ -131,7 +131,9 @@ class NvmExtension(Extension):
             encoding="utf-8",
         )
         if result.returncode == 0 and result.stdout.strip():
-            return frozenset(name for name in json.loads(result.stdout)["dependencies"])
+            return frozenset(
+                name for name in json.loads(result.stdout).get("dependencies", {})
+            )
         return frozenset()
 
 

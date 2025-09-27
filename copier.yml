@@ -27,7 +27,7 @@ _message_after_update: |
   You may also want to run 'make deps_update' in case the versions installed by
   the template are outdated.
 _tasks:
-  - command: uv lock
+  - command: uv sync
     when: "{{ uses_uv }}"
   - command: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
     when: "{{ uses_npm }}"
