@@ -29,6 +29,7 @@ dev = [
   {% endif %}
   {% if uses_pytest %}
   "pytest==8.4.2",
+  "pytest-cov==7.0.0",
   {% endif %}
   {% if uses_ruff %}
   "ruff==0.13.2",
@@ -52,6 +53,13 @@ dev = [
 requires = ["uv_build >= 0.8.17, <0.9.0"]
 build-backend = "uv_build"
 {% endif %}
+{% if uses_pytest %}
+
+[tool.coverage.run]
+{% if not is_python_package %}
+omit = ["tests/*"]
+{% endif %}
+{% endif %}
 {% if uses_mypy %}
 
 [tool.mypy]
@@ -74,7 +82,10 @@ strict = true
 {% if uses_pytest %}
 
 [tool.pytest.ini_options]
-{% if not is_python_package %}
+{% if is_python_package %}
+addopts = "--cov={{ project_name_slug }} --cov-report=term-missing"
+{% else %}
+addopts = "--cov --cov-report=term-missing"
 pythonpath = ["."]
 {% endif %}
 {% endif %}

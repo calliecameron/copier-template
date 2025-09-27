@@ -84,5 +84,5 @@ deepclean: clean
 	rm -rf .mypy_cache
 {% endif %}
 {% if uses_pytest %}
-	rm -rf .pytest_cache
+	rm -rf .pytest_cache .coverage
 {% endif %}

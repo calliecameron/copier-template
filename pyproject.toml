@@ -18,12 +18,16 @@ dev = [
   "mypy==1.18.2",
   "pre-commit==4.3.0",
   "pytest==8.4.2",
+  "pytest-cov==7.0.0",
   "ruff==0.13.2",
   "shellcheck-py==0.11.0.1",
   "tombi==0.6.17",
   "typos==1.36.3",
   "yamllint==1.37.1",
 ]
+
+[tool.coverage.run]
+omit = ["tests/*"]
 
 [tool.mypy]
 explicit_package_bases = true
@@ -35,6 +39,7 @@ scripts_are_modules = true
 strict = true
 
 [tool.pytest.ini_options]
+addopts = "--cov --cov-report=term-missing"
 pythonpath = ["."]
 
 [tool.ruff]
