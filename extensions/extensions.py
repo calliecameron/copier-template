@@ -251,6 +251,8 @@ class ConfigExtension(Extension):
                     {
                         # also .python-version, uv.lock
                         "toml",  # pyproject.toml
+                        "shell",  # .template_scripts/{uv_install_deps,uv_update_deps}
+                        "python",  # .template_scripts/uv_outdated_deps.py
                     },
                 ),
                 installed_by=None,
@@ -276,6 +278,7 @@ class ConfigExtension(Extension):
                     {
                         # also .nvmrc, .npmrc
                         "json",  # package.json, package-lock.json
+                        "shell",  # .template_scripts/{npm_install_deps,npm_update_deps}
                     },
                 ),
                 installed_by=None,
@@ -298,7 +301,11 @@ class ConfigExtension(Extension):
                 installed_by=None,
             ),
             "bats": Tool(
-                config_file_types=frozenset(),
+                config_file_types=frozenset(
+                    {
+                        "shell",  # .template_scripts/bats
+                    },
+                ),
                 installed_by="npm",
             ),
             "ruff": Tool(
