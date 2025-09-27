@@ -110,6 +110,12 @@ user_has_shell:
   default: "{{ 'shell' in config_stage2['file_types'] }}"
   when: "{{ 'shell' not in config_stage2['file_types'] }}"
 
+user_uses_bats:
+  type: bool
+  help: Uses bats?
+  default: "{{ 'bats' in config_stage2['tools'] }}"
+  when: "{{ user_has_shell and 'bats' not in config_stage2['tools'] }}"
+
 user_has_python:
   type: bool
   help: Has python?
@@ -188,6 +194,10 @@ user_config:
       {% endif %}
       {% if user_has_toml %}
       - toml
+      {% endif %}
+    tools:
+      {% if user_uses_bats %}
+      - bats
       {% endif %}
   when: false
 
@@ -274,6 +284,11 @@ uses_shellcheck:
 uses_shfmt:
   type: bool
   default: "{{ 'shfmt' in config['tools'] }}"
+  when: false
+
+uses_bats:
+  type: bool
+  default: "{{ 'bats' in config['tools'] }}"
   when: false
 
 uses_ruff:

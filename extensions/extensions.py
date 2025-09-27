@@ -296,6 +296,10 @@ class ConfigExtension(Extension):
                 config_file_types=frozenset(),  # .editorconfig
                 installed_by=None,
             ),
+            "bats": Tool(
+                config_file_types=frozenset(),
+                installed_by="npm",
+            ),
             "ruff": Tool(
                 config_file_types=frozenset(
                     {
@@ -391,13 +395,15 @@ class ConfigExtension(Extension):
 
     @staticmethod
     def expand_config(
-        new: Mapping[str, Sequence[str]],
-        existing: Mapping[str, Sequence[str]],
+        new: Mapping[str, Sequence[str] | None],
+        existing: Mapping[str, Sequence[str] | None],
     ) -> dict[str, list[str]]:
-        current_file_types = set(existing.get("file_types", [])) | set(
-            new.get("file_types", []),
+        current_file_types = set(existing.get("file_types", []) or []) | set(
+            new.get("file_types", []) or [],
         )
-        current_tools = set(existing.get("tools", [])) | set(new.get("tools", []))
+        current_tools = set(existing.get("tools", []) or []) | set(
+            new.get("tools", []) or [],
+        )
 
         while True:
             new_file_types = set(current_file_types)
@@ -439,6 +445,7 @@ class ConfigExtension(Extension):
         )
 
         file_types = set()
+        tools = set()
 
         for file in files:
             try:
@@ -449,8 +456,12 @@ class ConfigExtension(Extension):
                 if data.tags & tags:
                     file_types.add(file_type)
 
+            if "bats" in tags:
+                tools.add("bats")
+
         return {
             "file_types": sorted(file_types),
+            "tools": sorted(tools),
         }
 
     @staticmethod

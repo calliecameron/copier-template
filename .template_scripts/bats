@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -eu
+
+BATS_LIB_PATH="$(readlink -f "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../node_modules")"
+export BATS_LIB_PATH
+
+source "${NVM_DIR}/nvm.sh"
+nvm exec --silent npx bats "${@}"
