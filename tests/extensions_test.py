@@ -168,9 +168,11 @@ class TestConfigExtension:
             ],
             "tools": [
                 "mypy",
+                "node-license-checker",
                 "npm",
                 "pre-commit",
                 "prettier",
+                "python-license-checker",
                 "ruff",
                 "shellcheck",
                 "shfmt",
@@ -201,10 +203,12 @@ class TestConfigExtension:
             "tools": [
                 "markdownlint",
                 "mypy",
+                "node-license-checker",
                 "npm",
                 "pre-commit",
                 "prettier",
                 "pytest",
+                "python-license-checker",
                 "ruff",
                 "shellcheck",
                 "shfmt",
@@ -258,3 +262,21 @@ class TestConfigExtension:
         assert tags
         for l in tags.values():
             assert l == sorted(l)
+
+    def test_python_packages(self) -> None:
+        assert ConfigExtension.python_packages(
+            {"tools": ["pytest", "ruff"]},
+        ).keys() == {
+            "pytest",
+            "pytest-cov",
+            "ruff",
+        }
+
+    def test_node_packages(self) -> None:
+        assert ConfigExtension.node_packages(
+            {"tools": ["prettier", "stylelint"]},
+        ).keys() == {
+            "prettier",
+            "stylelint",
+            "stylelint-config-standard",
+        }

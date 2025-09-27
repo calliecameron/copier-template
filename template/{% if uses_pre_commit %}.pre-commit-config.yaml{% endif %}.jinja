@@ -12,6 +12,8 @@ repos:
     hooks:
       - id: uv-lock
         name: "uv: sync"
+{% endif %}
+{% if uses_python_license_checker %}
   - repo: local
     hooks:
       - id: uv-licenses
@@ -30,6 +32,10 @@ repos:
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
         files: "^(package\\.json|package-lock\\.json)$"
         pass_filenames: false
+{% endif %}
+{% if uses_node_license_checker %}
+  - repo: local
+    hooks:
       - id: npm-licenses
         name: "npm: check licenses"
         language: system

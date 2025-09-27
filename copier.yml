@@ -233,6 +233,16 @@ config:
   default: "{{ user_config | expand_config(config_stage2) }}"
   when: false
 
+python_packages:
+  type: yaml
+  default: "{{ config | python_packages }}"
+  when: false
+
+node_packages:
+  type: yaml
+  default: "{{ config | node_packages }}"
+  when: false
+
 has_shell:
   type: bool
   default: "{{ 'shell' in config['file_types'] }}"
@@ -293,9 +303,19 @@ uses_pre_commit:
   default: "{{ 'pre-commit' in config['tools'] }}"
   when: false
 
+uses_python_license_checker:
+  type: bool
+  default: "{{ 'python-license-checker' in config['tools'] }}"
+  when: false
+
 uses_npm:
   type: bool
   default: "{{ 'npm' in config['tools'] }}"
+  when: false
+
+uses_node_license_checker:
+  type: bool
+  default: "{{ 'node-license-checker' in config['tools'] }}"
   when: false
 
 uses_prettier:

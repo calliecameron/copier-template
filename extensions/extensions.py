@@ -147,10 +147,11 @@ class FileType:
 class Tool:
     config_file_types: frozenset[str]
     installed_by: str | None
+    requires: frozenset[str] = frozenset()
     tags: frozenset[str] = frozenset()
     file_regexes: frozenset[str] = frozenset()
-    python_packages: frozenset[str] = frozenset()
-    node_packages: frozenset[str] = frozenset()
+    python_packages: frozendict[str, str] = frozendict()
+    node_packages: frozendict[str, str] = frozendict()
 
 
 class ConfigExtension(Extension):
@@ -287,6 +288,11 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by=None,
+                requires=frozenset(
+                    {
+                        "python-license-checker",
+                    },
+                ),
             ),
             "copier": Tool(
                 config_file_types=frozenset(
@@ -295,9 +301,13 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="uv",
-                python_packages=frozenset(
+                python_packages=frozendict(
                     {
-                        "copier",
+                        "cookiecutter": "2.6.0",
+                        "copier": "9.10.2",
+                        "copier-template-extensions": "0.3.3",
+                        "frozendict": "2.4.6",
+                        "identify": "2.6.14",
                     },
                 ),
             ),
@@ -308,9 +318,18 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="uv",
-                python_packages=frozenset(
+                python_packages=frozendict(
                     {
-                        "pre-commit",
+                        "pre-commit": "4.3.0",
+                    },
+                ),
+            ),
+            "python-license-checker": Tool(
+                config_file_types=frozenset(),
+                installed_by="uv",
+                python_packages=frozendict(
+                    {
+                        "licensecheck": "2025.1.0",
                     },
                 ),
             ),
@@ -323,6 +342,20 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by=None,
+                requires=frozenset(
+                    {
+                        "node-license-checker",
+                    },
+                ),
+            ),
+            "node-license-checker": Tool(
+                config_file_types=frozenset(),
+                installed_by="npm",
+                node_packages=frozendict(
+                    {
+                        "license-checker-rseidelsohn": "4.4.2",
+                    },
+                ),
             ),
             "prettier": Tool(
                 config_file_types=frozenset(
@@ -332,18 +365,18 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="npm",
-                node_packages=frozenset(
+                node_packages=frozendict(
                     {
-                        "prettier",
+                        "prettier": "3.6.2",
                     },
                 ),
             ),
             "shellcheck": Tool(
                 config_file_types=frozenset(),  # .shellcheckrc
                 installed_by="uv",
-                python_packages=frozenset(
+                python_packages=frozendict(
                     {
-                        "shellcheck-py",
+                        "shellcheck-py": "0.11.0.1",
                     },
                 ),
             ),
@@ -363,9 +396,11 @@ class ConfigExtension(Extension):
                         "bats",
                     },
                 ),
-                node_packages=frozenset(
+                node_packages=frozendict(
                     {
-                        "bats",
+                        "bats": "1.12.0",
+                        "bats-assert": "2.2.0",
+                        "bats-support": "0.3.0",
                     },
                 ),
             ),
@@ -376,9 +411,9 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="uv",
-                python_packages=frozenset(
+                python_packages=frozendict(
                     {
-                        "ruff",
+                        "ruff": "0.13.2",
                     },
                 ),
             ),
@@ -389,9 +424,9 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="uv",
-                python_packages=frozenset(
+                python_packages=frozendict(
                     {
-                        "mypy",
+                        "mypy": "1.18.2",
                     },
                 ),
             ),
@@ -407,9 +442,10 @@ class ConfigExtension(Extension):
                         r"(.*/)?conftest\.py",
                     },
                 ),
-                python_packages=frozenset(
+                python_packages=frozendict(
                     {
-                        "pytest",
+                        "pytest": "8.4.2",
+                        "pytest-cov": "7.0.0",
                     },
                 ),
             ),
@@ -420,9 +456,13 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="npm",
-                node_packages=frozenset(
+                node_packages=frozendict(
                     {
-                        "eslint",
+                        "@eslint/compat": "1.4.0",
+                        "@eslint/js": "9.36.0",
+                        "eslint": "9.36.0",
+                        "eslint-config-prettier": "10.1.8",
+                        "globals": "16.4.0",
                     },
                 ),
             ),
@@ -433,9 +473,9 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="npm",
-                node_packages=frozenset(
+                node_packages=frozendict(
                     {
-                        "html-validate",
+                        "html-validate": "10.0.0",
                     },
                 ),
             ),
@@ -446,9 +486,10 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="npm",
-                node_packages=frozenset(
+                node_packages=frozendict(
                     {
-                        "stylelint",
+                        "stylelint": "16.24.0",
+                        "stylelint-config-standard": "39.0.0",
                     },
                 ),
             ),
@@ -459,9 +500,9 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="npm",
-                node_packages=frozenset(
+                node_packages=frozendict(
                     {
-                        "markdownlint-cli2",
+                        "markdownlint-cli2": "0.18.1",
                     },
                 ),
             ),
@@ -472,9 +513,9 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="uv",
-                python_packages=frozenset(
+                python_packages=frozendict(
                     {
-                        "yamllint",
+                        "yamllint": "1.37.1",
                     },
                 ),
             ),
@@ -485,9 +526,9 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="uv",
-                python_packages=frozenset(
+                python_packages=frozendict(
                     {
-                        "tombi",
+                        "tombi": "0.6.17",
                     },
                 ),
             ),
@@ -498,9 +539,9 @@ class ConfigExtension(Extension):
                     },
                 ),
                 installed_by="uv",
-                python_packages=frozenset(
+                python_packages=frozendict(
                     {
-                        "typos",
+                        "typos": "1.36.3",
                     },
                 ),
             ),
@@ -515,9 +556,9 @@ class ConfigExtension(Extension):
             "gitlint": Tool(
                 config_file_types=frozenset(),  # .gitlint
                 installed_by="uv",
-                python_packages=frozenset(
+                python_packages=frozendict(
                     {
-                        "gitlint",
+                        "gitlint": "0.19.1",
                     },
                 ),
             ),
@@ -529,6 +570,8 @@ class ConfigExtension(Extension):
         environment.filters["expand_config"] = ConfigExtension.expand_config
         environment.filters["detect_config"] = ConfigExtension.detect_config
         environment.filters["file_type_tags"] = ConfigExtension.file_type_tags
+        environment.filters["python_packages"] = ConfigExtension.python_packages
+        environment.filters["node_packages"] = ConfigExtension.node_packages
 
     @staticmethod
     def expand_config(
@@ -549,12 +592,13 @@ class ConfigExtension(Extension):
             for file_type in new_file_types:
                 new_tools.update(ConfigExtension._FILE_TYPES[file_type].tools)
 
-            installers = set()
+            tools_to_add = set()
             for tool in new_tools:
                 installed_by = ConfigExtension._TOOLS[tool].installed_by
                 if installed_by:
-                    installers.add(installed_by)
-            new_tools.update(installers)
+                    tools_to_add.add(installed_by)
+                tools_to_add.update(ConfigExtension._TOOLS[tool].requires)
+            new_tools.update(tools_to_add)
 
             for tool in new_tools:
                 new_file_types.update(ConfigExtension._TOOLS[tool].config_file_types)
@@ -600,8 +644,8 @@ class ConfigExtension(Extension):
             for tool, tool_data in ConfigExtension._TOOLS.items():
                 if (
                     tool_data.tags & tags
-                    or tool_data.python_packages & python_packages
-                    or tool_data.node_packages & node_packages
+                    or tool_data.python_packages.keys() & python_packages
+                    or tool_data.node_packages.keys() & node_packages
                 ):
                     tools.add(tool)
                     continue
@@ -621,3 +665,21 @@ class ConfigExtension(Extension):
             file_type: sorted(data.tags)
             for file_type, data in ConfigExtension._FILE_TYPES.items()
         }
+
+    @staticmethod
+    def python_packages(config: Mapping[str, Sequence[str] | None]) -> dict[str, str]:
+        tools = frozenset(config.get("tools", []) or [])
+        out: dict[str, str] = {}
+        for tool, data in ConfigExtension._TOOLS.items():
+            if tool in tools:
+                out.update(data.python_packages)
+        return out
+
+    @staticmethod
+    def node_packages(config: Mapping[str, Sequence[str] | None]) -> dict[str, str]:
+        tools = frozenset(config.get("tools", []) or [])
+        out: dict[str, str] = {}
+        for tool, data in ConfigExtension._TOOLS.items():
+            if tool in tools:
+                out.update(data.node_packages)
+        return out

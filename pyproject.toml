@@ -71,6 +71,9 @@ ignore = [
   "TRY301",
 ]
 
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["frozendict.frozendict"]
+
 [tool.tombi]
 
 [tool.typos]
