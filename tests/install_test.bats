@@ -11,7 +11,7 @@ setup() {
 run_copier() {
     REPO="${BATS_TEST_TMPDIR}/foo"
     mkdir "${REPO}"
-    git init "${REPO}"
+    git init --initial-branch=main "${REPO}"
     uv run --directory "${REPO}" \
         copier copy --trust --vcs-ref=HEAD \
         "${@}" \
