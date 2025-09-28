@@ -11,10 +11,14 @@ setup() {
 run_copier() {
     REPO="${BATS_TEST_TMPDIR}/foo"
     mkdir "${REPO}"
-    git init --initial-branch=main "${REPO}"
+    # shellcheck disable=SC2164
+    cd "${REPO}"
+    git init --initial-branch=main .
+    git config --local user.name Bar
+    git config --local user.email test@example.com
     # shellcheck disable=SC2164
     cd "${PROJECT_DIR}"
-    uv run --directory "${REPO}" \
+    uv run --project "${PROJECT_DIR}" --directory "${REPO}" \
         copier copy --trust --vcs-ref=HEAD \
         "${@}" \
         "${PROJECT_DIR}" "${REPO}"
