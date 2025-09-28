@@ -146,6 +146,12 @@ user_uses_pytest:
   default: "{{ 'pytest' in config_stage2['tools'] }}"
   when: "{{ user_has_python and 'pytest' not in config_stage2['tools'] }}"
 
+exports_requirements_txt:
+  type: bool
+  help: Exports requirements.txt? (For compatibility with other tools)
+  default: false
+  when: "{{ user_has_python }}"
+
 user_has_javascript:
   type: bool
   help: Has javascript?

@@ -11,6 +11,13 @@ repos:
     hooks:
       - id: uv-lock
         name: "uv: sync"
+      - id: uv-export
+        name: "uv: export"
+        args:
+          - --quiet
+          - --output-file=requirements.txt
+          - --all-extras
+          - --no-default-groups
   - repo: local
     hooks:
       - id: uv-licenses

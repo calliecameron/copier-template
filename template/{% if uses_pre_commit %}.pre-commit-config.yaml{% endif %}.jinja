@@ -12,6 +12,15 @@ repos:
     hooks:
       - id: uv-lock
         name: "uv: sync"
+{% if exports_requirements_txt %}
+      - id: uv-export
+        name: "uv: export"
+        args:
+          - --quiet
+          - --output-file=requirements.txt
+          - --all-extras
+          - --no-default-groups
+{% endif %}
 {% endif %}
 {% if uses_python_license_checker %}
   - repo: local
