@@ -9,7 +9,7 @@ setup() {
 }
 
 run_copier() {
-    REPO="${BATS_TEST_TMPDIR}/foo"
+    local REPO="${BATS_TEST_TMPDIR}/foo"
     mkdir "${REPO}"
     # shellcheck disable=SC2164
     cd "${REPO}"
