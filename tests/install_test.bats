@@ -43,6 +43,7 @@ run_copier() {
 @test "install all options" {
     run_copier \
         --data=project_name=Foo \
+        --data=author_name=Bar \
         --data=project_version=0.0.0 \
         --data=user_uses_bats=true \
         --data=is_python_package=true \
