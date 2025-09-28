@@ -30,7 +30,7 @@ _tasks:
   - command: uv sync
     when: "{{ uses_uv }}"
   - command: uv export --quiet --output-file=requirements.txt --all-extras --no-default-groups
-    when: "{{ uses_uv }}"
+    when: "{{ uses_uv and exports_requirements_txt }}"
   - command: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
     when: "{{ uses_npm }}"
 
