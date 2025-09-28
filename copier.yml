@@ -29,6 +29,8 @@ _message_after_update: |
 _tasks:
   - command: uv sync
     when: "{{ uses_uv }}"
+  - command: uv export --quiet --output-file=requirements.txt --all-extras --no-default-groups
+    when: "{{ uses_uv }}"
   - command: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
     when: "{{ uses_npm }}"
 
