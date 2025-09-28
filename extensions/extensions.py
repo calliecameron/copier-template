@@ -564,6 +564,7 @@ class ConfigExtension(Extension):
                     {
                         "actionlint",
                         "zizmor",
+                        "gha-update",
                     },
                 ),
                 file_regexes=frozenset(
@@ -582,6 +583,15 @@ class ConfigExtension(Extension):
                 python_packages=frozendict(
                     {
                         "zizmor": "1.14.1",
+                    },
+                ),
+            ),
+            "gha-update": Tool(
+                config_file_types=frozenset(),
+                installed_by="uv",
+                python_packages=frozendict(
+                    {
+                        "gha-update": "0.2.0",
                     },
                 ),
             ),

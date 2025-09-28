@@ -423,6 +423,11 @@ uses_zizmor:
   default: "{{ 'zizmor' in config['tools'] }}"
   when: false
 
+uses_gha_update:
+  type: bool
+  default: "{{ 'gha-update' in config['tools'] }}"
+  when: false
+
 uses_gitlint:
   type: bool
   default: "{{ 'gitlint' in config['tools'] }}"

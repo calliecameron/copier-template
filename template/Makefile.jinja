@@ -27,6 +27,9 @@ deps_update: deps
 {% if uses_pre_commit %}
 	uv run pre-commit autoupdate
 {% endif %}
+{% if uses_gha_update %}
+	uv run gha-update
+{% endif %}
 
 .PHONY: precommit
 precommit: deps

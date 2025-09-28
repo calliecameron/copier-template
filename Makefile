@@ -15,6 +15,7 @@ deps_update: deps
 	./.template_files/uv_update_deps
 	./.template_files/npm_update_deps
 	uv run pre-commit autoupdate
+	uv run gha-update
 
 .PHONY: precommit
 precommit: deps
