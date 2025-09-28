@@ -23,4 +23,6 @@ jobs:
       - name: Install node
         run: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm install'
       - name: Run tests
+        env:
+          TERM: dumb
         run: make ci

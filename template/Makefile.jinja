@@ -44,7 +44,7 @@ ci: precommit test_slow
 .PHONY: test_fast
 test_fast: deps
 {% if uses_bats %}
-	./.template_files/bats --filter-tags !slow -r tests
+	./.template_files/bats --pretty --filter-tags !slow -r tests
 {% endif %}
 {% if uses_pytest %}
 	uv run pytest -m 'not slow' tests
@@ -54,7 +54,7 @@ test_fast: deps
 .PHONY: test_slow
 test_slow: deps
 {% if uses_bats %}
-	./.template_files/bats --filter-tags slow -r tests
+	./.template_files/bats --pretty --filter-tags slow -r tests
 {% endif %}
 {% if uses_pytest %}
 	uv run pytest -m slow tests
