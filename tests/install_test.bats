@@ -12,8 +12,10 @@ run_copier() {
     REPO="${BATS_TEST_TMPDIR}/foo"
     mkdir "${REPO}"
     git init --initial-branch=main "${REPO}"
+    pwd
     # shellcheck disable=SC2164
     cd "${PROJECT_DIR}"
+    pwd
     uv run --verbose --directory "${REPO}" \
         copier copy --trust --vcs-ref=HEAD \
         "${@}" \
