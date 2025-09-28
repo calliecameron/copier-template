@@ -26,12 +26,14 @@ run_copier() {
     git commit -m 'Foo bar'
 }
 
+# bats test_tags=slow
 @test "install no options" {
     run_copier \
         --data=project_name=Foo \
         --defaults
 }
 
+# bats test_tags=slow
 @test "install all options" {
     run_copier \
         --data=project_name=Foo \

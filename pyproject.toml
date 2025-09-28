@@ -21,6 +21,7 @@ dev = [
   "pyfakefs>=5.9.3",
   "pytest==8.4.2",
   "pytest-cov==7.0.0",
+  "pytest-custom_exit_code==0.3.0",
   "pytest-subprocess>=1.5.3",
   "ruff==0.13.2",
   "shellcheck-py==0.11.0.1",
@@ -43,7 +44,8 @@ scripts_are_modules = true
 strict = true
 
 [tool.pytest.ini_options]
-addopts = "--cov --cov-report=term-missing"
+addopts = "--strict-markers --suppress-no-test-exit-code --cov --cov-report=term-missing"
+markers = ["slow"]
 pythonpath = ["."]
 
 [tool.ruff]

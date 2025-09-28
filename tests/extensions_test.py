@@ -269,6 +269,7 @@ class TestConfigExtension:
         ).keys() == {
             "pytest",
             "pytest-cov",
+            "pytest-custom_exit_code",
             "ruff",
         }
 

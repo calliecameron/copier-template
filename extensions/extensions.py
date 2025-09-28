@@ -446,6 +446,7 @@ class ConfigExtension(Extension):
                     {
                         "pytest": "8.4.2",
                         "pytest-cov": "7.0.0",
+                        "pytest-custom_exit_code": "0.3.0",
                     },
                 ),
             ),

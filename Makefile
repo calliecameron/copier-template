@@ -27,12 +27,14 @@ ci: precommit test_slow
 # Fast tests are run by pre-commit
 .PHONY: test_fast
 test_fast: deps
-	./.template_files/bats -r tests
-	uv run pytest tests
+	./.template_files/bats --filter-tags !slow -r tests
+	uv run pytest -m 'not slow' tests
 
 # Slow tests are only run in CI
 .PHONY: test_slow
 test_slow: deps
+	./.template_files/bats --filter-tags slow -r tests
+	uv run pytest -m slow tests
 
 .PHONY: template_reapply
 template_reapply: deps
