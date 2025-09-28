@@ -16,7 +16,7 @@ run_copier() {
     REPO="${BATS_TEST_TMPDIR}/foo"
     mkdir "${REPO}"
     git init --initial-branch=main "${REPO}"
-    uv run --verbose --project "${PROJECT_DIR}" --directory "${REPO}" \
+    uv run --project "${PROJECT_DIR}" --directory "${REPO}" \
         copier copy --trust --vcs-ref=HEAD \
         "${@}" \
         "${PROJECT_DIR}" "${REPO}"
@@ -34,6 +34,7 @@ run_copier() {
 @test "install no options" {
     run_copier \
         --data=project_name=Foo \
+        --data=author_name=Bar \
         --defaults
 }
 
@@ -41,6 +42,7 @@ run_copier() {
 @test "install all options" {
     run_copier \
         --data=project_name=Foo \
+        --data=author_name=Bar \
         --data=project_version=0.0.0 \
         --data=user_uses_bats=true \
         --data=is_python_package=true \
