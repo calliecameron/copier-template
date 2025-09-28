@@ -9,14 +9,7 @@ if [ ! -e pyproject.toml ]; then
     exit 1
 fi
 
-uv python list --output-format=json cpython |
-    jq '.[] | .version' |
-    sed 's/"//g' |
-    grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' |
-    LC_ALL=C sort -rV |
-    uniq |
-    head -n 1 |
-    xargs uv python pin --no-project
+uv python pin --no-project "$(uv run python "${THIS_DIR}/uv_latest_python.py")"
 
 sed -i "s/requires-python = \"==.*\"/requires-python = \"==$(cat .python-version)\"/g" pyproject.toml
 
