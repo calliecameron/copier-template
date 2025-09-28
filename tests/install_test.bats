@@ -3,6 +3,10 @@
 setup() {
     THIS_DIR="$(cd "$(dirname "${BATS_TEST_FILENAME}")" && pwd)"
     PROJECT_DIR="$(readlink -f "${THIS_DIR}/..")"
+    export GIT_AUTHOR_NAME="Bar"
+    export GIT_COMMITTER_NAME="${GIT_AUTHOR_NAME}"
+    export GIT_AUTHOR_EMAIL="test@example.com"
+    export GIT_COMMITTER_EMAIL="${GIT_AUTHOR_EMAIL}"
 
     bats_load_library 'bats-support'
     bats_load_library 'bats-assert'
@@ -38,7 +42,6 @@ run_copier() {
     run_copier \
         --data=project_name=Foo \
         --data=project_version=0.0.0 \
-        --data=author_name=Bar \
         --data=user_uses_bats=true \
         --data=is_python_package=true \
         --data=python_line_length=88 \
