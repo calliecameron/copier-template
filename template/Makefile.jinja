@@ -6,10 +6,10 @@ deps: .deps-installed
 
 .deps-installed: {% if uses_uv%}pyproject.toml uv.lock{% endif +%}{% if uses_npm %} package.json package-lock.json{% endif +%}
 {% if uses_uv %}
-	./.template_files/uv_install_deps
+	.template_files/uv_install_deps
 {% endif %}
 {% if uses_npm %}
-	./.template_files/npm_install_deps
+	.template_files/npm_install_deps
 {% endif %}
 {% if uses_pre_commit %}
 	uv run pre-commit install -f
@@ -19,10 +19,12 @@ deps: .deps-installed
 .PHONY: deps_update
 deps_update: deps
 {% if uses_uv %}
-	./.template_files/uv_update_deps
+	.template_files/uv_update_python
+	.template_files/uv_update_deps
 {% endif %}
 {% if uses_npm %}
-	./.template_files/npm_update_deps
+	.template_files/npm_update_node
+	.template_files/npm_update_deps
 {% endif %}
 {% if uses_pre_commit %}
 	uv run pre-commit autoupdate
@@ -44,7 +46,7 @@ ci: precommit test_slow
 .PHONY: test_fast
 test_fast: deps
 {% if uses_bats %}
-	./.template_files/bats --pretty --filter-tags !slow -r tests
+	.template_files/bats --pretty --filter-tags !slow -r tests
 {% endif %}
 {% if uses_pytest %}
 	uv run pytest -m 'not slow' tests
@@ -54,7 +56,7 @@ test_fast: deps
 .PHONY: test_slow
 test_slow: deps
 {% if uses_bats %}
-	./.template_files/bats --pretty --filter-tags slow -r tests
+	.template_files/bats --pretty --filter-tags slow -r tests
 {% endif %}
 {% if uses_pytest %}
 	uv run pytest -m slow tests

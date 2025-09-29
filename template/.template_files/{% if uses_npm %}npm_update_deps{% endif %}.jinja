@@ -8,7 +8,6 @@ if [ ! -e package.json ]; then
 fi
 
 source "${NVM_DIR}/nvm.sh"
-nvm use --save stable
 
 # shellcheck disable=SC2016
 nvm exec --silent npm outdated --parseable |
