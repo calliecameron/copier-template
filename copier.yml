@@ -27,11 +27,9 @@ _message_after_update: |
   You may also want to run 'make deps_update' in case the versions installed by
   the template are outdated.
 _tasks:
-  - command: uv sync
+  - command: ".template_files/uv_post_install{% if exports_requirements_txt %} --requirements-txt{% endif +%}"
     when: "{{ uses_uv }}"
-  - command: uv export --quiet --output-file=requirements.txt --all-extras --no-default-groups
-    when: "{{ uses_uv and exports_requirements_txt }}"
-  - command: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
+  - command: .template_files/npm_post_install
     when: "{{ uses_npm }}"
 
 file_type_tags:
