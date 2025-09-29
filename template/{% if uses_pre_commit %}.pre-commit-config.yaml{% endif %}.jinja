@@ -7,12 +7,18 @@ default_install_hook_types:
   - pre-merge-commit
 repos:
 {% if uses_uv %}
+  - repo: local
+    hooks:
+      - id: uv-sync
+        name: "uv: sync"
+        language: system
+        entry: uv sync --all-extras --all-groups
+        files: "^(pyproject\\.toml|uv\\.lock)$"
+        pass_filenames: false
+{% if exports_requirements_txt %}
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.8.22
     hooks:
-      - id: uv-lock
-        name: "uv: sync"
-{% if exports_requirements_txt %}
       - id: uv-export
         name: "uv: export"
         args:
@@ -35,7 +41,7 @@ repos:
 {% if uses_npm %}
   - repo: local
     hooks:
-      - id: npm-lock
+      - id: npm-sync
         name: "npm: sync"
         language: system
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'

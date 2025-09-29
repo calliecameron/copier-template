@@ -23,4 +23,4 @@ done
 rm "${TMPFILE}"
 rm -f uv.lock
 rm -rf .venv
-uv sync
+uv sync --all-extras --all-groups

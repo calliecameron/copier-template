@@ -7,4 +7,4 @@ if [ ! -e pyproject.toml ]; then
     exit 1
 fi
 
-uv sync
+uv sync --all-extras --all-groups

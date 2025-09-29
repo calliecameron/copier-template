@@ -21,7 +21,7 @@ if [ -n "${1:-}" ]; then
     fi
 fi
 
-uv sync
+uv sync --all-extras --all-groups
 
 if [ -n "${EXPORT_REQUIREMENTS}" ]; then
     uv export --quiet --output-file=requirements.txt --all-extras --no-default-groups
