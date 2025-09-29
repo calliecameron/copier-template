@@ -31,6 +31,10 @@ dev = [
   "zizmor==1.14.1",
 ]
 
+[build-system]
+requires = ["uv_build >= 0.8.22, <0.9.0"]
+build-backend = "uv_build"
+
 [tool.coverage.run]
 omit = ["tests/*"]
 
@@ -89,3 +93,6 @@ default.extend-ignore-re = [
   "(?s)(#|//)\\s*spellchecker:* off.*?\\n\\s*(#|//)\\s*spellchecker:* on",
   "(#|//)\\s*spellchecker:* disable-next-line\\n.*",
 ]
+
+[tool.uv]
+package = false

@@ -12,12 +12,10 @@ dev = [
   "{{ package }}=={{ version }}",
 {% endfor %}
 ]
-{% if is_python_package %}
 
 [build-system]
 requires = ["uv_build >= 0.8.22, <0.9.0"]
 build-backend = "uv_build"
-{% endif %}
 {% if uses_pytest %}
 
 [tool.coverage.run]
@@ -28,17 +26,9 @@ omit = ["tests/*"]
 {% if uses_mypy %}
 
 [tool.mypy]
-{% if is_python_package %}
-explicit_package_bases = false
-{% else %}
-explicit_package_bases = true
-{% endif %}
+explicit_package_bases = {% if is_python_package %}false{% else %}true{% endif +%}
 mypy_path = "stubs"
-{% if is_python_package %}
-namespace_packages = false
-{% else %}
-namespace_packages = true
-{% endif %}
+namespace_packages = {% if is_python_package %}false{% else %}true{% endif +%}
 pretty = true
 python_version = "{{ python_version.split(".")[:2] | join(".") }}"
 scripts_are_modules = true
@@ -47,11 +37,7 @@ strict = true
 {% if uses_pytest %}
 
 [tool.pytest.ini_options]
-{% if is_python_package %}
-addopts = "--strict-markers --suppress-no-test-exit-code --cov={{ project_name_slug }} --cov-report=term-missing"
-{% else %}
-addopts = "--strict-markers --suppress-no-test-exit-code --cov --cov-report=term-missing"
-{% endif %}
+addopts = "--strict-markers --suppress-no-test-exit-code --cov{% if is_python_package %}={{ project_name_slug }}{% endif %} --cov-report=term-missing"
 markers = ["slow"]
 {% if not is_python_package %}
 pythonpath = ["."]
@@ -108,3 +94,6 @@ default.extend-ignore-re = [
   "(#|//)\\s*spellchecker:* disable-next-line\\n.*",
 ]
 {% endif %}
+
+[tool.uv]
+package = {% if is_python_package %}true{% else %}false{% endif +%}
