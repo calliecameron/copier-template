@@ -9,18 +9,4 @@ if [ ! -e pyproject.toml ]; then
     exit 1
 fi
 
-TMPFILE="$(mktemp)"
-uv pip list --outdated --format=json >"${TMPFILE}"
-
-uv run python "${THIS_DIR}/uv_outdated_deps.py" "${TMPFILE}" 'pyproject.toml' | while read -r dep group; do
-    if [ -n "${group:-}" ]; then
-        uv add --no-sync --group "${group}" "${dep}"
-    else
-        uv add --no-sync "${dep}"
-    fi
-done
-
-rm "${TMPFILE}"
-rm -f uv.lock
-rm -rf .venv
-uv sync --all-extras --all-groups
+uv run python "${THIS_DIR}/uv_update_deps_internal.py"

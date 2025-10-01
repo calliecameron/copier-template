@@ -293,6 +293,12 @@ class ConfigExtension(Extension):
                         "python-license-checker",
                     },
                 ),
+                python_packages=frozendict(
+                    {
+                        "frozendict": "2.4.6",
+                        "packaging": "25.0",
+                    },
+                ),
             ),
             "copier": Tool(
                 config_file_types=frozenset(
@@ -306,7 +312,6 @@ class ConfigExtension(Extension):
                         "cookiecutter": "2.6.0",
                         "copier": "9.10.2",
                         "copier-template-extensions": "0.3.3",
-                        "frozendict": "2.4.6",
                         "identify": "2.6.14",
                     },
                 ),
