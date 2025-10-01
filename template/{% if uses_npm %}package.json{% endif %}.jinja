@@ -1,4 +1,6 @@
 {% set content %}
+name: "{{ project_name_slug }}"
+
 devDependencies: {
 {% for package, version in node_packages | dictsort %}
   "{{ package }}": "{{ version }}",
