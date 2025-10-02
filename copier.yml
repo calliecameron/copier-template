@@ -48,6 +48,7 @@ base_config:
       - copier
       - pre-commit
       - typos
+      - bump-my-version
       - gitleaks
       - gitlint
   when: false
@@ -76,12 +77,6 @@ project_name_slug:
   type: str
   default: "{{ project_name | slugify }}"
   when: false
-
-project_version:
-  type: str
-  help: Project version
-  default: "0.0.0"
-  validator: "{% if not project_version %}Project version must not be empty{% endif %}"
 
 author_name:
   type: str
@@ -400,6 +395,11 @@ uses_tombi:
 uses_typos:
   type: bool
   default: "{{ 'typos' in config['tools'] }}"
+  when: false
+
+uses_bump_my_version:
+  type: bool
+  default: "{{ 'bump-my-version' in config['tools'] }}"
   when: false
 
 uses_gitleaks:

@@ -261,6 +261,15 @@ repos:
         types_or:
           - text
 {% endif %}
+{% if uses_bump_my_version %}
+  - repo: local
+    hooks:
+      - id: bump-my-version
+        name: "general: version consistency"
+        language: system
+        entry: uv run bump-my-version replace --allow-dirty '--new-version={current_version}'
+        pass_filenames: false
+{% endif %}
 {% if uses_gitleaks %}
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.28.0

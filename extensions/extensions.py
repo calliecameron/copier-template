@@ -551,6 +551,19 @@ class ConfigExtension(Extension):
                     },
                 ),
             ),
+            "bump-my-version": Tool(
+                config_file_types=frozenset(
+                    {
+                        "toml",  # pyproject.toml
+                    },
+                ),
+                installed_by="uv",
+                python_packages=frozendict(
+                    {
+                        "bump-my-version": "1.2.3",
+                    },
+                ),
+            ),
             "gitleaks": Tool(
                 config_file_types=frozenset(
                     {

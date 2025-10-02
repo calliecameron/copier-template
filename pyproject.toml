@@ -9,6 +9,7 @@ dependencies = []
 
 [dependency-groups]
 dev = [
+  "bump-my-version==1.2.3",
   "cookiecutter==2.6.0",
   "copier==9.10.2",
   "copier-template-extensions==0.3.3",
@@ -36,6 +37,12 @@ dev = [
 [build-system]
 requires = ["uv_build >= 0.8.22, <0.9.0"]
 build-backend = "uv_build"
+
+[tool.bumpversion]
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = "version = \"{current_version}\""
+replace = "version = \"{new_version}\""
 
 [tool.coverage.run]
 omit = ["tests/*"]

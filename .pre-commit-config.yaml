@@ -204,6 +204,13 @@ repos:
         entry: uv run typos --write-changes --force-exclude
         types_or:
           - text
+  - repo: local
+    hooks:
+      - id: bump-my-version
+        name: "general: version consistency"
+        language: system
+        entry: uv run bump-my-version replace --allow-dirty '--new-version={current_version}'
+        pass_filenames: false
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.28.0
     hooks:
