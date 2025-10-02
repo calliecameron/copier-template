@@ -635,7 +635,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "tombi": "0.6.17",
+                        "tombi": "0.6.19",
                     },
                 ),
             ),
@@ -648,7 +648,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "typos": "1.36.3",
+                        "typos": "1.37.1",
                     },
                 ),
             ),
@@ -702,7 +702,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "zizmor": "1.14.1",
+                        "zizmor": "1.14.2",
                     },
                 ),
             ),
