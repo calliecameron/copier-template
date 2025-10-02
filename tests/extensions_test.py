@@ -1,11 +1,15 @@
 import pytest
+from frozendict import frozendict
 from pyfakefs.fake_filesystem import FakeFilesystem
 from pytest_subprocess.fake_process import FakeProcess
 
 from extensions.extensions import (
+    BoolTomlValue,
+    Config,
     ConfigExtension,
     GitExtension,
     NvmExtension,
+    StrTomlValue,
     UvExtension,
 )
 
@@ -80,6 +84,16 @@ class TestUvExtension:
         )
         assert UvExtension.get_python_packages() == frozenset()
 
+    def test_get_pyproject_toml_existing(self, fs: FakeFilesystem) -> None:
+        fs.create_file("pyproject.toml", contents='foo = "bar"')
+        assert UvExtension.get_pyproject_toml() == {"foo": "bar"}
+
+    def test_get_pyproject_toml_default(
+        self,
+        fs: FakeFilesystem,  # noqa: ARG002
+    ) -> None:
+        assert UvExtension.get_pyproject_toml() == {}
+
 
 class TestNvmExtension:
     def test_get_node_version_existing(
@@ -144,12 +158,116 @@ class TestNvmExtension:
         assert NvmExtension.get_node_packages() == frozenset()
 
 
-class TestConfigExtension:
-    def test_expand_config(self) -> None:
-        assert ConfigExtension.expand_config({}, {}) == {"file_types": [], "tools": []}
-        assert ConfigExtension.expand_config({"file_types": None}, {"tools": None}) == {
+class TestTomlValue:
+    def test_bool_toml_value(self) -> None:
+        b = BoolTomlValue(key="foo.bar")
+        assert b.get({}) is None
+        assert b.get({"foo": {}}) is None
+        assert b.get({"foo": {"bar": True}})
+        assert not b.get({"foo": {"bar": False}})
+        with pytest.raises(TypeError):
+            b.get({"foo": []})
+        with pytest.raises(TypeError):
+            b.get({"foo": {"bar": "baz"}})
+
+        assert BoolTomlValue(key="").get({}) is None
+
+    def test_str_toml_value(self) -> None:
+        s = StrTomlValue(key="foo.bar")
+        assert s.get({}) is None
+        assert s.get({"foo": {}}) is None
+        assert s.get({"foo": {"bar": "baz"}}) == "baz"
+        with pytest.raises(TypeError):
+            s.get({"foo": []})
+        with pytest.raises(TypeError):
+            s.get({"foo": {"bar": True}})
+
+        assert StrTomlValue(key="").get({}) is None
+
+
+class TestConfig:
+    def test_from_yaml(self) -> None:
+        assert Config.from_yaml({}) == Config(
+            file_types=frozenset(),
+            tools=frozenset(),
+            metadata=frozendict(),
+        )
+
+        assert Config.from_yaml(
+            {
+                "file_types": None,
+                "tools": None,
+                "metadata": None,
+            },
+        ) == Config(
+            file_types=frozenset(),
+            tools=frozenset(),
+            metadata=frozendict(),
+        )
+
+        assert Config.from_yaml(
+            {
+                "file_types": ["foo", "bar"],
+                "tools": ["baz", "quux"],
+                "metadata": {
+                    "a": "b",
+                    "c": 2,
+                },
+            },
+        ) == Config(
+            file_types=frozenset({"bar", "foo"}),
+            tools=frozenset({"baz", "quux"}),
+            metadata=frozendict(
+                {
+                    "a": "b",
+                    "c": 2,
+                },
+            ),
+        )
+
+        with pytest.raises(TypeError):
+            Config.from_yaml({"file_types": {"foo": "bar"}})
+        with pytest.raises(TypeError):
+            Config.from_yaml({"tools": {"foo": "bar"}})
+        with pytest.raises(TypeError):
+            Config.from_yaml({"metadata": ["foo"]})
+
+    def test_to_yaml(self) -> None:
+        assert Config(
+            file_types=frozenset(),
+            tools=frozenset(),
+            metadata=frozendict(),
+        ).to_yaml() == {
             "file_types": [],
             "tools": [],
+            "metadata": {},
+        }
+
+        assert Config(
+            file_types=frozenset({"foo", "bar"}),
+            tools=frozenset({"baz", "quux"}),
+            metadata=frozendict({"a": "b", "c": 2}),
+        ).to_yaml() == {
+            "file_types": ["bar", "foo"],
+            "tools": ["baz", "quux"],
+            "metadata": {"a": "b", "c": 2},
+        }
+
+
+class TestConfigExtension:
+    def test_expand_config(self) -> None:
+        assert ConfigExtension.expand_config({}, {}) == {
+            "file_types": [],
+            "tools": [],
+            "metadata": {},
+        }
+        assert ConfigExtension.expand_config(
+            {"file_types": None, "metadata": None},
+            {"tools": None},
+        ) == {
+            "file_types": [],
+            "tools": [],
+            "metadata": {},
         }
 
         assert ConfigExtension.expand_config(
@@ -157,6 +275,7 @@ class TestConfigExtension:
             {
                 "file_types": ["shell"],
                 "tools": ["pre-commit"],
+                "metadata": {"foo": "bar"},
             },
         ) == {
             "file_types": [
@@ -180,16 +299,21 @@ class TestConfigExtension:
                 "uv",
                 "yamllint",
             ],
+            "metadata": {
+                "foo": "bar",
+            },
         }
 
         assert ConfigExtension.expand_config(
             {
                 "file_types": ["markdown"],
                 "tools": ["pytest"],
+                "metadata": {"baz": 2},
             },
             {
                 "file_types": ["shell"],
                 "tools": ["pre-commit"],
+                "metadata": {"foo": "bar"},
             },
         ) == {
             "file_types": [
@@ -216,6 +340,10 @@ class TestConfigExtension:
                 "uv",
                 "yamllint",
             ],
+            "metadata": {
+                "foo": "bar",
+                "baz": 2,
+            },
         }
 
     def test_detect_config(
@@ -255,6 +383,7 @@ class TestConfigExtension:
         assert ConfigExtension.detect_config("") == {
             "file_types": ["python", "shell"],
             "tools": ["bats", "mypy", "prettier", "pytest"],
+            "metadata": {},
         }
 
     def test_file_type_tags(self) -> None:

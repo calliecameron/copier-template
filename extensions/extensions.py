@@ -1,8 +1,11 @@
 import json
 import re
 import subprocess
-from collections.abc import Mapping, Sequence
+import tomllib
+from abc import ABC, abstractmethod
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from typing import Any, override
 
 from frozendict import frozendict
 from identify import identify
@@ -88,6 +91,14 @@ class UvExtension(Extension):
             return frozenset(p["name"] for p in json.loads(result.stdout))
         return frozenset()
 
+    @staticmethod
+    def get_pyproject_toml() -> frozendict[str, Any]:
+        try:
+            with open("pyproject.toml", "rb") as f:
+                return frozendict(tomllib.load(f))
+        except OSError:
+            return frozendict()
+
 
 class NvmExtension(Extension):
     def __init__(self, environment: Environment) -> None:  # pragma: no cover
@@ -152,6 +163,96 @@ class Tool:
     file_regexes: frozenset[str] = frozenset()
     python_packages: frozendict[str, str] = frozendict()
     node_packages: frozendict[str, str] = frozendict()
+
+
+class TomlValue(ABC):
+    def __init__(self, *, key: str) -> None:
+        super().__init__()
+        self._key = tuple(part for part in key.split(".") if part)
+
+    @abstractmethod
+    def _typecheck(self, value: Any) -> bool:  # noqa: ANN401  # pragma: no cover
+        raise NotImplementedError
+
+    def get(self, data: Mapping[str, Any]) -> Any | None:  # noqa: ANN401
+        for i, k in enumerate(self._key):
+            if k not in data:
+                return None
+            v = data[k]
+            if i == len(self._key) - 1:
+                if not self._typecheck(v):
+                    raise TypeError(
+                        f"Value {'.'.join(self._key)} in pyproject.toml has unexpected "
+                        f"type {type(v)}",
+                    )
+                return v
+            if not isinstance(v, dict):
+                raise TypeError(
+                    f"Indexed into pyproject.toml value {'.'.join(self._key)} that "
+                    f"isn't a dict (got {type(v)})",
+                )
+            data = v
+        return None
+
+
+class BoolTomlValue(TomlValue):
+    @override
+    def _typecheck(self, value: Any) -> bool:
+        return isinstance(value, bool)
+
+
+class StrTomlValue(TomlValue):
+    @override
+    def _typecheck(self, value: Any) -> bool:
+        return isinstance(value, str)
+
+
+@dataclass(frozen=True, kw_only=True)
+class Metadata:
+    pyproject_toml_value: TomlValue
+
+
+RawConfig = Mapping[str, Sequence[str] | Mapping[str, Any] | None]
+
+
+@dataclass(frozen=True, kw_only=True)
+class Config:
+    file_types: frozenset[str]
+    tools: frozenset[str]
+    metadata: frozendict[str, Any]
+
+    @staticmethod
+    def from_yaml(data: RawConfig) -> "Config":
+        def _set(key: str) -> frozenset[str]:
+            v = data.get(key, []) or []
+            if not isinstance(v, Sequence):
+                raise TypeError(
+                    f"Config key '{key}' is {type(data[key])} (wanted "
+                    f"Sequence[str] | None)",
+                )
+            return frozenset(v)
+
+        def _dict(key: str) -> frozendict[str, Any]:
+            v = data.get(key, {}) or {}
+            if not isinstance(v, Mapping):
+                raise TypeError(
+                    f"Config key '{key}' is {type(data[key])} (wanted "
+                    f"Mapping[str, Any] | None)",
+                )
+            return frozendict(v)
+
+        return Config(
+            file_types=_set("file_types"),
+            tools=_set("tools"),
+            metadata=_dict("metadata"),
+        )
+
+    def to_yaml(self) -> dict[str, list[str] | dict[str, Any]]:
+        return {
+            "file_types": sorted(self.file_types),
+            "tools": sorted(self.tools),
+            "metadata": dict(self.metadata),
+        }
 
 
 class ConfigExtension(Extension):
@@ -636,15 +737,13 @@ class ConfigExtension(Extension):
 
     @staticmethod
     def expand_config(
-        new: Mapping[str, Sequence[str] | None],
-        existing: Mapping[str, Sequence[str] | None],
-    ) -> dict[str, list[str]]:
-        current_file_types = set(existing.get("file_types", []) or []) | set(
-            new.get("file_types", []) or [],
-        )
-        current_tools = set(existing.get("tools", []) or []) | set(
-            new.get("tools", []) or [],
-        )
+        new_raw: RawConfig,
+        existing_raw: RawConfig,
+    ) -> RawConfig:
+        new = Config.from_yaml(new_raw)
+        existing = Config.from_yaml(existing_raw)
+        current_file_types = set(existing.file_types | new.file_types)
+        current_tools = set(existing.tools | new.tools)
 
         while True:
             new_file_types = set(current_file_types)
@@ -665,16 +764,17 @@ class ConfigExtension(Extension):
                 new_file_types.update(ConfigExtension._TOOLS[tool].config_file_types)
 
             if new_file_types == current_file_types and new_tools == current_tools:
-                return {
-                    "file_types": sorted(new_file_types),
-                    "tools": sorted(new_tools),
-                }
+                return Config(
+                    file_types=frozenset(new_file_types),
+                    tools=frozenset(new_tools),
+                    metadata=existing.metadata | new.metadata,
+                ).to_yaml()
 
             current_file_types = new_file_types
             current_tools = new_tools
 
     @staticmethod
-    def detect_config(_: str) -> dict[str, list[str]]:
+    def detect_config(_: str) -> RawConfig:
         files = sorted(
             subprocess.run(
                 ["git", "ls-files", "--cached", "--others", "--exclude-standard"],
@@ -715,10 +815,11 @@ class ConfigExtension(Extension):
                     if re.fullmatch(regex, file) is not None:
                         tools.add(tool)
 
-        return {
-            "file_types": sorted(file_types),
-            "tools": sorted(tools),
-        }
+        return Config(
+            file_types=frozenset(file_types),
+            tools=frozenset(tools),
+            metadata=frozendict(),
+        ).to_yaml()
 
     @staticmethod
     def file_type_tags(_: str) -> dict[str, list[str]]:
@@ -728,19 +829,21 @@ class ConfigExtension(Extension):
         }
 
     @staticmethod
-    def python_packages(config: Mapping[str, Sequence[str] | None]) -> dict[str, str]:
-        tools = frozenset(config.get("tools", []) or [])
+    def _packages(
+        config: RawConfig,
+        selector: Callable[[Tool], frozendict[str, str]],
+    ) -> dict[str, str]:
+        tools = Config.from_yaml(config).tools
         out: dict[str, str] = {}
         for tool, data in ConfigExtension._TOOLS.items():
             if tool in tools:
-                out.update(data.python_packages)
+                out.update(selector(data))
         return out
 
     @staticmethod
-    def node_packages(config: Mapping[str, Sequence[str] | None]) -> dict[str, str]:
-        tools = frozenset(config.get("tools", []) or [])
-        out: dict[str, str] = {}
-        for tool, data in ConfigExtension._TOOLS.items():
-            if tool in tools:
-                out.update(data.node_packages)
-        return out
+    def python_packages(config: RawConfig) -> dict[str, str]:
+        return ConfigExtension._packages(config, lambda d: d.python_packages)
+
+    @staticmethod
+    def node_packages(config: RawConfig) -> dict[str, str]:
+        return ConfigExtension._packages(config, lambda d: d.node_packages)
