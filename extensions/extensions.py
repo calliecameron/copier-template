@@ -727,6 +727,21 @@ class ConfigExtension(Extension):
         },
     )
 
+    _METADATA = frozendict[str, Metadata](
+        {
+            "project_version": Metadata(
+                pyproject_toml_value=StrTomlValue(
+                    key="project.version",
+                ),
+            ),
+            "is_python_package": Metadata(
+                pyproject_toml_value=BoolTomlValue(
+                    key="tool.uv.package",
+                ),
+            ),
+        },
+    )
+
     def __init__(self, environment: Environment) -> None:  # pragma: no cover
         super().__init__(environment)
         environment.filters["expand_config"] = ConfigExtension.expand_config
@@ -788,6 +803,7 @@ class ConfigExtension(Extension):
 
         python_packages = UvExtension.get_python_packages()
         node_packages = NvmExtension.get_node_packages()
+        pyproject_toml = UvExtension.get_pyproject_toml()
 
         file_types = set()
         tools = set()
@@ -815,10 +831,16 @@ class ConfigExtension(Extension):
                     if re.fullmatch(regex, file) is not None:
                         tools.add(tool)
 
+        metadata = {}
+        for m, m_data in ConfigExtension._METADATA.items():
+            data = m_data.pyproject_toml_value.get(pyproject_toml)
+            if data is not None:
+                metadata[m] = data
+
         return Config(
             file_types=frozenset(file_types),
             tools=frozenset(tools),
-            metadata=frozendict(),
+            metadata=frozendict(metadata),
         ).to_yaml()
 
     @staticmethod

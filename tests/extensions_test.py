@@ -356,6 +356,16 @@ class TestConfigExtension:
         fs.chmod("bar/bar", 0o700)
         fs.create_file("baz.bats", contents="")
         fs.create_file("conftest.py", contents="")
+        fs.create_file(
+            "pyproject.toml",
+            contents="""
+[project]
+version = "1.2.3"
+
+[tool.uv]
+package = false
+""",
+        )
 
         fp.register(
             ["git", "ls-files", "--cached", "--others", "--exclude-standard"],
@@ -383,7 +393,10 @@ class TestConfigExtension:
         assert ConfigExtension.detect_config("") == {
             "file_types": ["python", "shell"],
             "tools": ["bats", "mypy", "prettier", "pytest"],
-            "metadata": {},
+            "metadata": {
+                "project_version": "1.2.3",
+                "is_python_package": False,
+            },
         }
 
     def test_file_type_tags(self) -> None:

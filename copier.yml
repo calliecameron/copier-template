@@ -122,11 +122,11 @@ user_has_python:
   default: "{{ 'python' in config_stage2['file_types'] }}"
   when: "{{ 'python' not in config_stage2['file_types'] }}"
 
-is_python_package:
+user_is_python_package:
   type: bool
   help: Is python package? (No for standalone scripts)
-  default: false
-  when: "{{ user_has_python }}"
+  default: "{{ config_stage2['metadata'].get('is_python_package', False) }}"
+  when: "{{ user_has_python and 'is_python_package' not in config_stage2['metadata'] }}"
 
 user_uses_pytest:
   type: bool
@@ -235,6 +235,8 @@ user_config:
       {% if user_uses_github_actions %}
       - github-actions
       {% endif %}
+    metadata:
+      is_python_package: {% if user_is_python_package %}true{% else %}false{% endif +%}
   when: false
 
 config:
@@ -250,6 +252,16 @@ python_packages:
 node_packages:
   type: yaml
   default: "{{ config | node_packages }}"
+  when: false
+
+project_version:
+  type: str
+  default: "{{ config['metadata'].get('project_version', '0.0.0') }}"
+  when: false
+
+is_python_package:
+  type: bool
+  default: "{{ config['metadata']['is_python_package'] }}"
   when: false
 
 has_shell:
