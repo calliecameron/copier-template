@@ -133,13 +133,6 @@ is_python_package:
   default: false
   when: "{{ user_has_python }}"
 
-python_line_length:
-  type: int
-  help: Python line length
-  default: 88 # ruff's default
-  validator: "{% if python_line_length < 80 %}Python line length must be at least 80{% endif %}"
-  when: "{{ user_has_python }}"
-
 user_uses_pytest:
   type: bool
   help: Uses pytest?

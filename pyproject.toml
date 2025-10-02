@@ -55,7 +55,6 @@ markers = ["slow"]
 pythonpath = ["."]
 
 [tool.ruff]
-line-length = 88
 namespace-packages = [
   ".template_files",
 ]

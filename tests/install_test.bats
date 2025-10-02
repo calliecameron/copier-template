@@ -47,7 +47,6 @@ run_copier() {
         --data=author_name=Bar \
         --data=user_uses_bats=true \
         --data=is_python_package=true \
-        --data=python_line_length=88 \
         --data=user_uses_pytest=true \
         --data=exports_requirements_txt=true \
         --data=user_has_javascript=true \
