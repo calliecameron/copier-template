@@ -4,7 +4,7 @@ all: precommit
 .PHONY: deps
 deps: .deps-installed
 
-.deps-installed: {% if uses_uv%}pyproject.toml uv.lock{% endif +%}{% if uses_npm %} package.json package-lock.json{% endif +%}{% if uses_pre_commit %} .pre-commit-config.yaml{% endif +%}
+.deps-installed: {% if uses_uv%}pyproject.toml uv.lock{% endif +%}{% if uses_npm %} package.json package-lock.json{% endif +%}{% if uses_pre_commit %} .pre-commit-config.yaml .template_files/pre_push{% endif +%}
 {% if uses_uv %}
 	.template_files/uv_install_deps
 {% endif %}
@@ -12,7 +12,7 @@ deps: .deps-installed
 	.template_files/npm_install_deps
 {% endif %}
 {% if uses_pre_commit %}
-	uv run pre-commit install -f
+	.template_files/pre_commit_install
 {% endif %}
 	touch .deps-installed
 

@@ -4,10 +4,10 @@ all: precommit
 .PHONY: deps
 deps: .deps-installed
 
-.deps-installed: pyproject.toml uv.lock package.json package-lock.json .pre-commit-config.yaml
+.deps-installed: pyproject.toml uv.lock package.json package-lock.json .pre-commit-config.yaml .template_files/pre_push
 	.template_files/uv_install_deps
 	.template_files/npm_install_deps
-	uv run pre-commit install -f
+	.template_files/pre_commit_install
 	touch .deps-installed
 
 .PHONY: deps_update
