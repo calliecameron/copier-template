@@ -413,7 +413,7 @@ class ConfigExtension(Extension):
                         "cookiecutter": "2.6.0",
                         "copier": "9.10.2",
                         "copier-template-extensions": "0.3.3",
-                        "identify": "2.6.14",
+                        "identify": "2.6.15",
                     },
                 ),
             ),
@@ -519,7 +519,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "ruff": "0.13.2",
+                        "ruff": "0.13.3",
                     },
                 ),
             ),
