@@ -27,7 +27,7 @@ replace = "version = \"{new_version}\""
 {% if is_python_package %}
 
 [[tool.bumpversion.files]]
-filename = "src/{{ project_name_slug}}/__init__.py"
+filename = "src/{{ project_name_slug_underscore }}/__init__.py"
 search = "__version__ = \".*\""
 regex = true
 replace = "__version__ = \"{new_version}\""
@@ -54,7 +54,7 @@ strict = true
 {% if uses_pytest %}
 
 [tool.pytest.ini_options]
-addopts = "--strict-markers --suppress-no-test-exit-code --cov{% if is_python_package %}={{ project_name_slug }}{% endif %} --cov-report=term-missing"
+addopts = "--strict-markers --suppress-no-test-exit-code --cov{% if is_python_package %}={{ project_name_slug_underscore }}{% endif %} --cov-report=term-missing"
 markers = ["slow"]
 {% if not is_python_package %}
 pythonpath = ["."]

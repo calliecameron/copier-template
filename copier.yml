@@ -78,6 +78,11 @@ project_name_slug:
   default: "{{ project_name | slugify }}"
   when: false
 
+project_name_slug_underscore:
+  type: str
+  default: "{{ project_name | slugify(separator='_') }}"
+  when: false
+
 author_name:
   type: str
   help: Author name
