@@ -16,13 +16,17 @@ deps: .deps-installed
 {% endif %}
 	touch .deps-installed
 
+# We run each 'update_deps' step twice, before and after updating the interpreter,
+# in case existing package versions aren't compatible with the new interpreter.
 .PHONY: deps_update
 deps_update: deps
 {% if uses_uv %}
+	.template_files/uv_update_deps
 	.template_files/uv_update_python
 	.template_files/uv_update_deps
 {% endif %}
 {% if uses_npm %}
+	.template_files/npm_update_deps
 	.template_files/npm_update_node
 	.template_files/npm_update_deps
 {% endif %}
