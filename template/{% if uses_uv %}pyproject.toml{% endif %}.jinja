@@ -47,7 +47,9 @@ explicit_package_bases = {% if is_python_package %}false{% else %}true{% endif +
 mypy_path = "stubs"
 namespace_packages = {% if is_python_package %}false{% else %}true{% endif +%}
 pretty = true
+{% if max_python_version != min_python_version %}
 python_version = "{{ max_python_version }}"
+{% endif %}
 scripts_are_modules = true
 strict = true
 {% endif %}
@@ -66,7 +68,9 @@ pythonpath = ["."]
 namespace-packages = [
   ".template_files",
 ]
+{% if max_python_version != min_python_version %}
 target-version = "py{{ max_python_version | replace('.', '') }}"
+{% endif %}
 
 [tool.ruff.lint]
 select = ["ALL"]

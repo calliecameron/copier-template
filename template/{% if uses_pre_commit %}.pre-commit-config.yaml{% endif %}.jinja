@@ -143,7 +143,7 @@ repos:
       - id: "ruff-check{% if max_python_version != min_python_version %}-{{ version }}{% endif %}"
         name: "python{% if max_python_version != min_python_version %} {{ version }}{% endif %}: lint"
         language: system
-        entry: "uv run ruff check --force-exclude{% if version != max_python_version %} --target-version=py{{ version | replace('.', '') }}{% endif %}{% if version == max_python_version %} --fix{% endif %}"
+        entry: "uv run ruff check --force-exclude{% if max_python_version != min_python_version %} --target-version=py{{ version | replace('.', '') }}{% endif %}{% if version == max_python_version %} --fix{% endif %}"
         types_or:
 {% for tag in file_type_tags["python"] %}
           - "{{ tag }}"
@@ -167,7 +167,7 @@ repos:
       - id: "mypy{% if max_python_version != min_python_version %}-{{ version }}{% endif %}"
         name: "python{% if max_python_version != min_python_version %} {{ version }}{% endif %}: typecheck"
         language: system
-        entry: "uv run mypy{% if version != max_python_version %} --python-version {{ version }}{% endif %}"
+        entry: "uv run mypy{% if max_python_version != min_python_version %} --python-version {{ version }}{% endif %}"
         types_or:
 {% for tag in file_type_tags["python"] %}
           - "{{ tag }}"

@@ -44,7 +44,7 @@ install_all_options() {
         --data=project_name=Foo \
         --data=author_name=Bar \
         --data=user_uses_bats=true \
-        "--data=max_python_version=${1}" \
+        "--data=max_python_version=${2}" \
         "--data=min_python_version=${1}" \
         --data=user_is_python_package=true \
         --data=user_uses_pytest=true \
@@ -58,15 +58,20 @@ install_all_options() {
 
 # bats test_tags=slow
 @test "install all options 3.14" {
-    install_all_options 3.14
+    install_all_options 3.14 3.14
 }
 
 # bats test_tags=slow
 @test "install all options 3.13" {
-    install_all_options 3.13
+    install_all_options 3.13 3.13
 }
 
 # bats test_tags=slow
 @test "install all options 3.12" {
-    install_all_options 3.12
+    install_all_options 3.12 3.12
+}
+
+# bats test_tags=slow
+@test "install all options multi" {
+    install_all_options 3.12 3.14
 }
