@@ -39,12 +39,13 @@ run_copier() {
         --defaults
 }
 
-# bats test_tags=slow
-@test "install all options" {
+install_all_options() {
     run_copier \
         --data=project_name=Foo \
         --data=author_name=Bar \
         --data=user_uses_bats=true \
+        "--data=max_python_version=${1}" \
+        "--data=min_python_version=${1}" \
         --data=user_is_python_package=true \
         --data=user_uses_pytest=true \
         --data=exports_requirements_txt=true \
@@ -53,4 +54,19 @@ run_copier() {
         --data=user_has_css=true \
         --data=user_uses_github_actions=true \
         --data=github_repo=foo/bar
+}
+
+# bats test_tags=slow
+@test "install all options 3.14" {
+    install_all_options 3.14
+}
+
+# bats test_tags=slow
+@test "install all options 3.13" {
+    install_all_options 3.13
+}
+
+# bats test_tags=slow
+@test "install all options 3.12" {
+    install_all_options 3.12
 }

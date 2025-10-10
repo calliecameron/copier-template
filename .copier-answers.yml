@@ -1,8 +1,10 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: v0.1.3-5-g172988f
+_commit: v0.1.3-6-gd4c827e
 _src_path: .
 author_name: Callie Cameron
 copyright_start_year: '2025'
 exports_requirements_txt: true
 github_repo: calliecameron/copier-template
+max_python_version: '3.14'
+min_python_version: '3.12'
 project_name: Copier template

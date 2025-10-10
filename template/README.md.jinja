@@ -1,11 +1,14 @@
 # {{ project_name }}
 
 {% if uses_copier %}
-[![template](https://img.shields.io/badge/template-calliecameron%2Fcopier--template-brightgreen)](https://github.com/calliecameron/copier-template)
+[![template](https://img.shields.io/badge/template-calliecameron%2Fcopier--template-blue)](https://github.com/calliecameron/copier-template)
 {% endif %}
 {% if uses_pre_commit %}
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-blue?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 {% endif %}
 {% if uses_github_actions %}
 [![CI](https://github.com/{{ github_repo }}/actions/workflows/ci.yml/badge.svg)](https://github.com/{{ github_repo }}/actions/workflows/ci.yml)
+{% endif %}
+{% if has_python %}
+![python](https://img.shields.io/badge/python-{{ "_%7C_".join(python_versions) }}-blue)
 {% endif %}

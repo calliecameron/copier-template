@@ -105,7 +105,7 @@ repos:
         language: system
         entry: uv run shellcheck
         types_or:
-          - shell
+          - "shell"
         exclude_types:
           - zsh
         require_serial: true
@@ -116,31 +116,63 @@ repos:
         name: "shell: format"
   - repo: local
     hooks:
-      - id: ruff-check
-        name: "python: lint"
+      - id: "ruff-check-3.14"
+        name: "python 3.14: lint"
         language: system
-        entry: uv run ruff check --force-exclude --fix
+        entry: "uv run ruff check --force-exclude --fix"
         types_or:
-          - pyi
-          - python
+          - "pyi"
+          - "python"
+        require_serial: true
+      - id: "ruff-check-3.13"
+        name: "python 3.13: lint"
+        language: system
+        entry: "uv run ruff check --force-exclude --target-version=py313"
+        types_or:
+          - "pyi"
+          - "python"
+        require_serial: true
+      - id: "ruff-check-3.12"
+        name: "python 3.12: lint"
+        language: system
+        entry: "uv run ruff check --force-exclude --target-version=py312"
+        types_or:
+          - "pyi"
+          - "python"
         require_serial: true
       - id: ruff-format
         name: "python: format"
         language: system
         entry: uv run ruff format --force-exclude
         types_or:
-          - pyi
-          - python
+          - "pyi"
+          - "python"
         require_serial: true
   - repo: local
     hooks:
-      - id: mypy
-        name: "python: typecheck"
+      - id: "mypy-3.14"
+        name: "python 3.14: typecheck"
         language: system
-        entry: uv run mypy
+        entry: "uv run mypy"
         types_or:
-          - pyi
-          - python
+          - "pyi"
+          - "python"
+        require_serial: true
+      - id: "mypy-3.13"
+        name: "python 3.13: typecheck"
+        language: system
+        entry: "uv run mypy --python-version 3.13"
+        types_or:
+          - "pyi"
+          - "python"
+        require_serial: true
+      - id: "mypy-3.12"
+        name: "python 3.12: typecheck"
+        language: system
+        entry: "uv run mypy --python-version 3.12"
+        types_or:
+          - "pyi"
+          - "python"
         require_serial: true
   - repo: local
     hooks:
@@ -149,7 +181,7 @@ repos:
         language: system
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx eslint --fix "${@}"' --
         types_or:
-          - javascript
+          - "javascript"
   - repo: local
     hooks:
       - id: htmlvalidate
@@ -157,7 +189,7 @@ repos:
         language: system
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx html-validate "${@}"' --
         types_or:
-          - html
+          - "html"
   - repo: local
     hooks:
       - id: stylelint
@@ -165,7 +197,7 @@ repos:
         language: system
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx stylelint --fix "${@}"' --
         types_or:
-          - css
+          - "css"
   - repo: local
     hooks:
       - id: markdownlint
@@ -173,7 +205,7 @@ repos:
         language: system
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx markdownlint-cli2 --fix "${@}"' --
         types_or:
-          - markdown
+          - "markdown"
   - repo: local
     hooks:
       - id: yamllint
@@ -181,7 +213,7 @@ repos:
         language: system
         entry: uv run yamllint --strict
         types_or:
-          - yaml
+          - "yaml"
   - repo: local
     hooks:
       - id: tombi-lint
@@ -189,13 +221,13 @@ repos:
         language: system
         entry: uv run tombi lint
         types_or:
-          - toml
+          - "toml"
       - id: tombi-format
         name: "toml: format"
         language: system
         entry: uv run tombi format
         types_or:
-          - toml
+          - "toml"
   - repo: local
     hooks:
       - id: typos

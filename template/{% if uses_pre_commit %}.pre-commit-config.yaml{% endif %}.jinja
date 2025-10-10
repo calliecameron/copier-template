@@ -123,7 +123,7 @@ repos:
         entry: uv run shellcheck
         types_or:
 {% for tag in file_type_tags["shell"] %}
-          - {{ tag }}
+          - "{{ tag }}"
 {% endfor %}
         exclude_types:
           - zsh
@@ -139,37 +139,41 @@ repos:
 {% if uses_ruff %}
   - repo: local
     hooks:
-      - id: ruff-check
-        name: "python: lint"
+{% for version in python_versions | reverse %}
+      - id: "ruff-check{% if max_python_version != min_python_version %}-{{ version }}{% endif %}"
+        name: "python{% if max_python_version != min_python_version %} {{ version }}{% endif %}: lint"
         language: system
-        entry: uv run ruff check --force-exclude --fix
+        entry: "uv run ruff check --force-exclude{% if version != max_python_version %} --target-version=py{{ version | replace('.', '') }}{% endif %}{% if version == max_python_version %} --fix{% endif %}"
         types_or:
 {% for tag in file_type_tags["python"] %}
-          - {{ tag }}
+          - "{{ tag }}"
 {% endfor %}
         require_serial: true
+{% endfor %}
       - id: ruff-format
         name: "python: format"
         language: system
         entry: uv run ruff format --force-exclude
         types_or:
 {% for tag in file_type_tags["python"] %}
-          - {{ tag }}
+          - "{{ tag }}"
 {% endfor %}
         require_serial: true
 {% endif %}
 {% if uses_mypy %}
   - repo: local
     hooks:
-      - id: mypy
-        name: "python: typecheck"
+{% for version in python_versions | reverse %}
+      - id: "mypy{% if max_python_version != min_python_version %}-{{ version }}{% endif %}"
+        name: "python{% if max_python_version != min_python_version %} {{ version }}{% endif %}: typecheck"
         language: system
-        entry: uv run mypy
+        entry: "uv run mypy{% if version != max_python_version %} --python-version {{ version }}{% endif %}"
         types_or:
 {% for tag in file_type_tags["python"] %}
-          - {{ tag }}
+          - "{{ tag }}"
 {% endfor %}
         require_serial: true
+{% endfor %}
 {% endif %}
 {% if uses_eslint %}
   - repo: local
@@ -180,7 +184,7 @@ repos:
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx eslint --fix "${@}"' --
         types_or:
 {% for tag in file_type_tags["javascript"] %}
-          - {{ tag }}
+          - "{{ tag }}"
 {% endfor %}
 {% endif %}
 {% if uses_htmlvalidate %}
@@ -192,7 +196,7 @@ repos:
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx html-validate "${@}"' --
         types_or:
 {% for tag in file_type_tags["html"] %}
-          - {{ tag }}
+          - "{{ tag }}"
 {% endfor %}
 {% endif %}
 {% if uses_stylelint %}
@@ -204,7 +208,7 @@ repos:
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx stylelint --fix "${@}"' --
         types_or:
 {% for tag in file_type_tags["css"] %}
-          - {{ tag }}
+          - "{{ tag }}"
 {% endfor %}
 {% endif %}
 {% if uses_markdownlint %}
@@ -216,7 +220,7 @@ repos:
         entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx markdownlint-cli2 --fix "${@}"' --
         types_or:
 {% for tag in file_type_tags["markdown"] %}
-          - {{ tag }}
+          - "{{ tag }}"
 {% endfor %}
 {% endif %}
 {% if uses_yamllint %}
@@ -228,7 +232,7 @@ repos:
         entry: uv run yamllint --strict
         types_or:
 {% for tag in file_type_tags["yaml"] %}
-          - {{ tag }}
+          - "{{ tag }}"
 {% endfor %}
 {% endif %}
 {% if uses_tombi %}
@@ -240,7 +244,7 @@ repos:
         entry: uv run tombi lint
         types_or:
 {% for tag in file_type_tags["toml"] %}
-          - {{ tag }}
+          - "{{ tag }}"
 {% endfor %}
       - id: tombi-format
         name: "toml: format"
@@ -248,7 +252,7 @@ repos:
         entry: uv run tombi format
         types_or:
 {% for tag in file_type_tags["toml"] %}
-          - {{ tag }}
+          - "{{ tag }}"
 {% endfor %}
 {% endif %}
 {% if uses_typos %}

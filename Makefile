@@ -35,12 +35,16 @@ ci: precommit test_slow
 test_fast: deps
 	.template_files/bats --pretty --filter-tags !slow -r tests
 	uv run pytest -m 'not slow' tests
+	uv run --isolated --python '3.13' pytest -m 'not slow' tests
+	uv run --isolated --python '3.12' pytest -m 'not slow' tests
 
 # Slow tests are only run in CI
 .PHONY: test_slow
 test_slow: deps
 	.template_files/bats --pretty --filter-tags slow -r tests
 	uv run pytest -m slow tests
+	uv run --isolated --python '3.13' pytest -m slow tests
+	uv run --isolated --python '3.12' pytest -m slow tests
 
 .PHONY: template_reapply
 template_reapply: deps

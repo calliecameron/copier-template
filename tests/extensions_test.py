@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 import pytest
@@ -10,6 +12,7 @@ from extensions.extensions import (
     ConfigExtension,
     GitExtension,
     Nvm,
+    PythonExtension,
     StrTomlValue,
     Toml,
 )
@@ -32,6 +35,53 @@ class TestGitExtension:
 
         fp.register(["git", "config", "user.name"], returncode=1)
         assert GitExtension.get_git_user_name("bar") == "bar"
+
+
+class TestPythonExtension:
+    def test_parse_version(self) -> None:
+        assert PythonExtension.parse_version("3.13") == (3, 13)
+        assert PythonExtension.parse_version("3.13.2") == (3, 13)
+        with pytest.raises(ValueError):
+            PythonExtension.parse_version("3")
+        with pytest.raises(ValueError):
+            PythonExtension.parse_version("foo")
+
+    def test_parse_versions(self) -> None:
+        assert PythonExtension.parse_versions([]) == []
+        assert PythonExtension.parse_versions(["3.13", "3.12", "3.12"]) == [
+            (3, 12),
+            (3, 13),
+        ]
+
+    def test_join_versions(self) -> None:
+        assert PythonExtension.join_versions([]) == []
+        assert PythonExtension.join_versions([(3, 13), (3, 12), (3, 12)]) == [
+            "3.12",
+            "3.13",
+        ]
+
+    def test_enumerate_python_versions(self) -> None:
+        assert PythonExtension.enumerate_python_versions("3.12", "3.12") == ["3.12"]
+        assert PythonExtension.enumerate_python_versions("3.12", "3.14") == [
+            "3.12",
+            "3.13",
+            "3.14",
+        ]
+
+        with pytest.raises(ValueError):
+            PythonExtension.enumerate_python_versions("2.7", "3.13")
+        with pytest.raises(ValueError):
+            PythonExtension.enumerate_python_versions("3.14", "3.13")
+
+    def test_filter_python_versions_leq(self) -> None:
+        assert PythonExtension.filter_python_versions_leq([], "3.13") == []
+        assert PythonExtension.filter_python_versions_leq(
+            ["3.14", "3.12", "3.13", "3.12"],
+            "3.13",
+        ) == ["3.12", "3.13"]
+
+    def test_increment_python_version(self) -> None:
+        assert PythonExtension.increment_python_version("3.13") == "3.14"
 
 
 class TestToml:
@@ -147,7 +197,25 @@ requires = ["foo=bar"]
         fs: FakeFilesystem,
     ) -> None:
         fs.create_file(".python-version", contents="3.13.0")
-        assert UV.python_version() == "3.13.0"
+        assert UV.python_version("3.13") == "3.13.0"
+
+    def test_python_version_existing_different_minor_version(
+        self,
+        fp: FakeProcess,
+        fs: FakeFilesystem,
+        mocker: MockerFixture,
+    ) -> None:
+        mocker.patch("os.getenv").return_value = "uv"
+        fs.create_file(".python-version", contents="3.12.0")
+        fp.register(
+            ["uv", "python", "list", "--output-format=json", "cpython@3.13"],
+            stdout="""[
+  {"version": "3.13.0"},
+  {"version": "3.13.1"},
+  {"version": "3.13.2rc1"}
+]""",
+        )
+        assert UV.python_version("3.13") == "3.13.1"
 
     def test_python_version_default(
         self,
@@ -157,14 +225,14 @@ requires = ["foo=bar"]
     ) -> None:
         mocker.patch("os.getenv").return_value = "uv"
         fp.register(
-            ["uv", "python", "list", "--output-format=json", "cpython"],
+            ["uv", "python", "list", "--output-format=json", "cpython@3.12"],
             stdout="""[
-  {"version": "3.14.0rc1"},
   {"version": "3.12.0"},
-  {"version": "3.13.1"}
+  {"version": "3.12.1"},
+  {"version": "3.12.2rc1"}
 ]""",
         )
-        assert UV.python_version() == "3.13.1"
+        assert UV.python_version("3.12") == "3.12.1"
 
     def test_python_version_fails(
         self,
@@ -174,11 +242,11 @@ requires = ["foo=bar"]
     ) -> None:
         mocker.patch("os.getenv").return_value = "uv"
         fp.register(
-            ["uv", "python", "list", "--output-format=json", "cpython"],
+            ["uv", "python", "list", "--output-format=json", "cpython@3.13"],
             stdout='[{"version": "3.14.0rc1"}]',
         )
         with pytest.raises(ValueError):
-            UV.python_version()
+            UV.python_version("3.13")
 
     def test_installed_python_packages(
         self,
@@ -566,7 +634,6 @@ version = "1.2.3"
 package = false
 """,
         )
-        fs.create_file(".python-version", contents="3.13.0")
         fs.create_file(".nvmrc", contents="v24.6.0")
         fs.create_file(
             "/foo/bar/pyproject.toml",
@@ -627,7 +694,13 @@ requires = ["foo=bar"]
             "metadata": {
                 "uv_version": "0.9.0",
                 "uv_build_spec": "foo=bar",
-                "python_version": "3.13.0",
+                "template_min_allowed_python_version": "3.12",
+                "template_max_allowed_python_version": "3.14",
+                "template_allowed_python_versions": [
+                    "3.12",
+                    "3.13",
+                    "3.14",
+                ],
                 "node_version": "v24.6.0",
                 "file_type_tags": {
                     "shell": ["shell"],
@@ -644,6 +717,14 @@ requires = ["foo=bar"]
                 "is_python_package": False,
             },
         }
+
+    def test_python_version_exact(
+        self,
+        fp: FakeProcess,  # noqa: ARG002
+        fs: FakeFilesystem,
+    ) -> None:
+        fs.create_file(".python-version", contents="3.13.0")
+        assert ConfigExtension.python_version_exact("3.13") == "3.13.0"
 
     def test_python_packages(self) -> None:
         assert ConfigExtension.python_packages(

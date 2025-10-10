@@ -8,6 +8,7 @@ _jinja_extensions:
   - cookiecutter.extensions.SlugifyExtension
   - extensions/extensions.py:StrictUndefinedExtension
   - extensions/extensions.py:GitExtension
+  - extensions/extensions.py:PythonExtension
   - extensions/extensions.py:ConfigExtension
 _subdirectory: template
 _message_after_copy: |
@@ -109,6 +110,34 @@ user_has_python:
   help: Has python?
   default: "{{ 'python' in config_stage2['file_types'] }}"
   when: "{{ 'python' not in config_stage2['file_types'] }}"
+
+max_python_version:
+  type: str
+  help: Max supported python version?
+  default: "{{ config_stage2['metadata']['template_max_allowed_python_version'] }}"
+  choices: |
+    {% for version in config_stage2['metadata']['template_allowed_python_versions'] | reverse %}
+    - "{{ version }}"
+    {% endfor %}
+  when: "{{ user_has_python }}"
+
+min_python_version:
+  type: str
+  help: Min supported python version?
+  default: "{{ max_python_version }}"
+  choices: |
+    {% for version in config_stage2['metadata']['template_allowed_python_versions'] | filter_python_versions_leq(max_python_version) | reverse %}
+    - "{{ version }}"
+    {% endfor %}
+  when: "{{ user_has_python }}"
+
+python_versions:
+  type: yaml
+  default: |
+    {% for version in min_python_version | enumerate_python_versions(max_python_version) %}
+    - "{{ version }}"
+    {% endfor %}
+  when: false
 
 user_is_python_package:
   type: bool
@@ -225,6 +254,7 @@ user_config:
       {% endif %}
     metadata:
       is_python_package: {% if user_is_python_package %}true{% else %}false{% endif +%}
+      python_version_exact: "{{ max_python_version | python_version_exact }}"
   when: false
 
 config:
@@ -242,9 +272,9 @@ uv_build_spec:
   default: "{{ config['metadata']['uv_build_spec'] }}"
   when: false
 
-python_version:
+python_version_exact:
   type: str
-  default: "{{ config['metadata']['python_version'] }}"
+  default: "{{ config['metadata']['python_version_exact'] }}"
   when: false
 
 node_version:

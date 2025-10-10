@@ -53,7 +53,9 @@ test_fast: deps
 	.template_files/bats --pretty --filter-tags !slow -r tests
 {% endif %}
 {% if uses_pytest %}
-	uv run pytest -m 'not slow' tests
+{% for version in python_versions | reverse %}
+	uv run{% if version != max_python_version %} --isolated --python '{{ version }}'{% endif %} pytest -m 'not slow' tests
+{% endfor %}
 {% endif %}
 
 # Slow tests are only run in CI
@@ -63,7 +65,9 @@ test_slow: deps
 	.template_files/bats --pretty --filter-tags slow -r tests
 {% endif %}
 {% if uses_pytest %}
-	uv run pytest -m slow tests
+{% for version in python_versions | reverse %}
+	uv run{% if version != max_python_version %} --isolated --python '{{ version }}'{% endif %} pytest -m slow tests
+{% endfor %}
 {% endif %}
 {% if uses_copier %}
 

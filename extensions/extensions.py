@@ -41,6 +41,68 @@ class GitExtension(Extension):
         return default
 
 
+class PythonExtension(Extension):
+    def __init__(self, environment: Environment) -> None:  # pragma: no cover
+        super().__init__(environment)
+        environment.filters["enumerate_python_versions"] = (
+            PythonExtension.enumerate_python_versions
+        )
+        environment.filters["filter_python_versions_leq"] = (
+            PythonExtension.filter_python_versions_leq
+        )
+        environment.filters["increment_python_version"] = (
+            PythonExtension.increment_python_version
+        )
+
+    @staticmethod
+    def parse_version(v: str) -> tuple[int, int]:
+        match = re.fullmatch(r"([1-9][0-9]*)\.([0-9]+)(\.[0-9]+)?", v)
+        if match is None:
+            raise ValueError(f"Invalid python version '{v}'")
+        return int(match.group(1)), int(match.group(2))
+
+    @staticmethod
+    def parse_versions(vs: Sequence[str]) -> list[tuple[int, int]]:
+        return sorted({PythonExtension.parse_version(v) for v in vs})
+
+    @staticmethod
+    def join_versions(vs: Sequence[tuple[int, int]]) -> list[str]:
+        return [f"{v[0]}.{v[1]}" for v in sorted(set(vs))]
+
+    @staticmethod
+    def enumerate_python_versions(first: str, last: str) -> list[str]:
+        v1 = PythonExtension.parse_version(first)
+        v2 = PythonExtension.parse_version(last)
+
+        if v1[0] != v2[0]:
+            raise ValueError(
+                f"Python versions must have same major version; got {first} and {last}",
+            )
+        major = v1[0]
+
+        if v1 > v2:
+            raise ValueError(
+                f"Python versions passed in the wrong order; got {first} and {last}",
+            )
+
+        return [f"{major}.{minor}" for minor in range(v1[1], v2[1] + 1)]
+
+    @staticmethod
+    def filter_python_versions_leq(
+        versions: Sequence[str],
+        max_version: str,
+    ) -> list[str]:
+        highest = PythonExtension.parse_version(max_version)
+        return PythonExtension.join_versions(
+            [v for v in PythonExtension.parse_versions(versions) if v <= highest],
+        )
+
+    @staticmethod
+    def increment_python_version(version: str) -> str:
+        major, minor = PythonExtension.parse_version(version)
+        return f"{major}.{minor + 1}"
+
+
 class Toml:
     @staticmethod
     def load(filename: str) -> frozendict[str, Any]:
@@ -108,10 +170,10 @@ class UV:
         return requires[0]
 
     @staticmethod
-    def _default_python_version() -> str:
+    def _default_python_version(version_hint: str) -> str:
         j = json.loads(
             UV._uv(
-                ["python", "list", "--output-format=json", "cpython"],
+                ["python", "list", "--output-format=json", f"cpython@{version_hint}"],
             ).stdout,
         )
 
@@ -135,8 +197,13 @@ class UV:
             return ""
 
     @staticmethod
-    def python_version() -> str:
-        return UV._existing_python_version() or UV._default_python_version()
+    def python_version(version_hint: str) -> str:
+        existing = UV._existing_python_version()
+        if existing and PythonExtension.parse_version(
+            existing,
+        ) == PythonExtension.parse_version(version_hint):
+            return existing
+        return UV._default_python_version(version_hint)
 
     @staticmethod
     def installed_python_packages() -> frozenset[str]:
@@ -319,6 +386,9 @@ class Config:
 
 
 class ConfigExtension(Extension):
+    _MIN_PYTHON_VERSION = "3.12"
+    _MAX_PYTHON_VERSION = "3.14"
+
     _FILE_TYPES: frozendict[str, FileType] = frozendict(
         {
             "shell": FileType(
@@ -794,7 +864,18 @@ class ConfigExtension(Extension):
         {
             "uv_version": Call(UV.uv_version),
             "uv_build_spec": Call(UV.uv_build_spec),
-            "python_version": Call(UV.python_version),
+            "template_min_allowed_python_version": Call(
+                lambda: ConfigExtension._MIN_PYTHON_VERSION,
+            ),
+            "template_max_allowed_python_version": Call(
+                lambda: ConfigExtension._MAX_PYTHON_VERSION,
+            ),
+            "template_allowed_python_versions": Call(
+                lambda: PythonExtension.enumerate_python_versions(
+                    ConfigExtension._MIN_PYTHON_VERSION,
+                    ConfigExtension._MAX_PYTHON_VERSION,
+                ),
+            ),
             "node_version": Call(Nvm.node_version),
             "file_type_tags": Call(lambda: ConfigExtension.file_type_tags()),
             "project_version": StrTomlValue(
@@ -813,6 +894,9 @@ class ConfigExtension(Extension):
         super().__init__(environment)
         environment.filters["expand_config"] = ConfigExtension.expand_config
         environment.filters["detect_config"] = ConfigExtension.detect_config
+        environment.filters["python_version_exact"] = (
+            ConfigExtension.python_version_exact
+        )
         environment.filters["python_packages"] = ConfigExtension.python_packages
         environment.filters["node_packages"] = ConfigExtension.node_packages
 
@@ -914,6 +998,10 @@ class ConfigExtension(Extension):
             tools=frozenset(tools),
             metadata=frozendict(metadata),
         ).to_yaml()
+
+    @staticmethod
+    def python_version_exact(version_hint: str) -> str:
+        return UV.python_version(version_hint)
 
     @staticmethod
     def _packages(
