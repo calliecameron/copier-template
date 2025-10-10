@@ -6,9 +6,9 @@
 {% if uses_pre_commit %}
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-blue?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 {% endif %}
-{% if uses_github_actions %}
-[![CI](https://github.com/{{ github_repo }}/actions/workflows/ci.yml/badge.svg)](https://github.com/{{ github_repo }}/actions/workflows/ci.yml)
-{% endif %}
 {% if has_python %}
 ![python](https://img.shields.io/badge/python-{{ "_%7C_".join(python_versions) }}-blue)
+{% endif %}
+{% if uses_github_actions %}
+[![CI](https://github.com/{{ github_repo }}/actions/workflows/ci.yml/badge.svg)](https://github.com/{{ github_repo }}/actions/workflows/ci.yml)
 {% endif %}
