@@ -1,6 +1,7 @@
 import pytest
 from frozendict import frozendict
 from pyfakefs.fake_filesystem import FakeFilesystem
+from pytest_mock import MockerFixture
 from pytest_subprocess.fake_process import FakeProcess
 
 from extensions.extensions import (
@@ -29,6 +30,100 @@ class TestGitExtension:
 
 
 class TestUvExtension:
+    def test_get_uv_version(
+        self,
+        fp: FakeProcess,
+        mocker: MockerFixture,
+    ) -> None:
+        mocker.patch("os.getenv").return_value = "uv"
+        fp.register(
+            ["uv", "--version"],
+            stdout="uv 0.9.0",
+        )
+        assert UvExtension.get_uv_version("") == "0.9.0"
+
+    def test_get_uv_version_fails(
+        self,
+        fp: FakeProcess,
+        mocker: MockerFixture,
+    ) -> None:
+        mocker.patch("os.getenv").return_value = "uv"
+        fp.register(
+            ["uv", "--version"],
+            stdout="uv",
+        )
+        with pytest.raises(ValueError):
+            UvExtension.get_uv_version("")
+
+    def test_get_uv_build_spec(
+        self,
+        fp: FakeProcess,
+        fs: FakeFilesystem,
+        mocker: MockerFixture,
+    ) -> None:
+        mocker.patch("os.getenv").return_value = "uv"
+        mocker.patch(
+            "tempfile.TemporaryDirectory",
+        ).return_value.__enter__.return_value = "/foo/bar"
+        fp.register(
+            [
+                "uv",
+                "init",
+                "--name",
+                "temp",
+                "--bare",
+                "--package",
+                "--build-backend",
+                "uv",
+                "--vcs",
+                "none",
+                "--author-from",
+                "none",
+                "--no-workspace",
+                "/foo/bar",
+            ],
+        )
+        fs.create_file(
+            "/foo/bar/pyproject.toml",
+            contents="""
+[build-system]
+requires = ["foo=bar"]
+""",
+        )
+        assert UvExtension.get_uv_build_spec("") == "foo=bar"
+
+    def test_get_uv_build_spec_fails(
+        self,
+        fp: FakeProcess,
+        fs: FakeFilesystem,
+        mocker: MockerFixture,
+    ) -> None:
+        mocker.patch("os.getenv").return_value = "uv"
+        mocker.patch(
+            "tempfile.TemporaryDirectory",
+        ).return_value.__enter__.return_value = "/foo/bar"
+        fp.register(
+            [
+                "uv",
+                "init",
+                "--name",
+                "temp",
+                "--bare",
+                "--package",
+                "--build-backend",
+                "uv",
+                "--vcs",
+                "none",
+                "--author-from",
+                "none",
+                "--no-workspace",
+                "/foo/bar",
+            ],
+        )
+        fs.create_file("/foo/bar/pyproject.toml")
+        with pytest.raises(ValueError):
+            UvExtension.get_uv_build_spec("")
+
     def test_get_python_version_existing(
         self,
         fp: FakeProcess,  # noqa: ARG002
@@ -41,7 +136,9 @@ class TestUvExtension:
         self,
         fp: FakeProcess,
         fs: FakeFilesystem,  # noqa: ARG002
+        mocker: MockerFixture,
     ) -> None:
+        mocker.patch("os.getenv").return_value = "uv"
         fp.register(
             ["uv", "python", "list", "--output-format=json", "cpython"],
             stdout="""[
@@ -56,7 +153,9 @@ class TestUvExtension:
         self,
         fp: FakeProcess,
         fs: FakeFilesystem,  # noqa: ARG002
+        mocker: MockerFixture,
     ) -> None:
+        mocker.patch("os.getenv").return_value = "uv"
         fp.register(
             ["uv", "python", "list", "--output-format=json", "cpython"],
             stdout='[{"version": "3.14.0rc1"}]',
@@ -64,14 +163,24 @@ class TestUvExtension:
         with pytest.raises(ValueError):
             UvExtension.get_python_version("")
 
-    def test_get_python_packages(self, fp: FakeProcess) -> None:
+    def test_get_python_packages(
+        self,
+        fp: FakeProcess,
+        mocker: MockerFixture,
+    ) -> None:
+        mocker.patch("os.getenv").return_value = "uv"
         fp.register(
             ["uv", "pip", "list", "--format=json"],
             '[{"name": "foo"}, {"name": "bar"}]',
         )
         assert UvExtension.get_python_packages() == frozenset({"foo", "bar"})
 
-    def test_get_python_packages_fails(self, fp: FakeProcess) -> None:
+    def test_get_python_packages_fails(
+        self,
+        fp: FakeProcess,
+        mocker: MockerFixture,
+    ) -> None:
+        mocker.patch("os.getenv").return_value = "uv"
         fp.register(
             ["uv", "pip", "list", "--format=json"],
             "",
@@ -350,7 +459,10 @@ class TestConfigExtension:
         self,
         fp: FakeProcess,
         fs: FakeFilesystem,
+        mocker: MockerFixture,
     ) -> None:
+        mocker.patch("os.getenv").return_value = "uv"
+
         fs.create_file("foo.py", contents="")
         fs.create_file("bar/bar", contents="#!/bin/bash")
         fs.chmod("bar/bar", 0o700)

@@ -17,7 +17,7 @@ repos:
         pass_filenames: false
 {% if exports_requirements_txt %}
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.8.22
+    rev: "{{ uv_version }}"
     hooks:
       - id: uv-export
         name: "uv: export"

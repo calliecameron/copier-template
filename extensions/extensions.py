@@ -1,6 +1,8 @@
 import json
+import os.path
 import re
 import subprocess
+import tempfile
 import tomllib
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Mapping, Sequence
@@ -40,16 +42,72 @@ class GitExtension(Extension):
 class UvExtension(Extension):
     def __init__(self, environment: Environment) -> None:  # pragma: no cover
         super().__init__(environment)
+        environment.filters["get_uv_version"] = UvExtension.get_uv_version
+        environment.filters["get_uv_build_spec"] = UvExtension.get_uv_build_spec
         environment.filters["get_python_version"] = UvExtension.get_python_version
+
+    @staticmethod
+    def _uv(
+        args: Sequence[str],
+        *,
+        check: bool = True,
+    ) -> subprocess.CompletedProcess[str]:
+        # Make sure we're calling the global uv, in case a dependency installed
+        # a different version of uv inside the virtualenv.
+        uv = os.getenv("UV", "uv")
+        return subprocess.run(
+            [uv, *args],
+            capture_output=True,
+            check=check,
+            encoding="utf-8",
+        )
+
+    @staticmethod
+    def get_uv_version(_: str) -> str:
+        raw = UvExtension._uv(["--version"]).stdout
+
+        match = re.search(r"[0-9]+\.[0-9]+\.[0-9]+", raw)
+        if match is None:
+            raise ValueError("Can't find uv version")
+
+        return match.group(0)
+
+    @staticmethod
+    def get_uv_build_spec(_: str) -> str:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            UvExtension._uv(
+                [
+                    "init",
+                    "--name",
+                    "temp",
+                    "--bare",
+                    "--package",
+                    "--build-backend",
+                    "uv",
+                    "--vcs",
+                    "none",
+                    "--author-from",
+                    "none",
+                    "--no-workspace",
+                    tmpdir,
+                ],
+            )
+
+            data = UvExtension.get_pyproject_toml(
+                os.path.join(tmpdir, "pyproject.toml"),
+            )
+
+        requires: list[str] = data.get("build-system", {}).get("requires", [])
+        if not requires:
+            raise ValueError("Can't find uv build spec")
+
+        return requires[0]
 
     @staticmethod
     def _default_python_version() -> str:
         j = json.loads(
-            subprocess.run(
-                ["uv", "python", "list", "--output-format=json", "cpython"],
-                capture_output=True,
-                check=True,
-                encoding="utf-8",
+            UvExtension._uv(
+                ["python", "list", "--output-format=json", "cpython"],
             ).stdout,
         )
 
@@ -81,20 +139,18 @@ class UvExtension(Extension):
 
     @staticmethod
     def get_python_packages() -> frozenset[str]:
-        result = subprocess.run(
-            ["uv", "pip", "list", "--format=json"],
-            capture_output=True,
+        result = UvExtension._uv(
+            ["pip", "list", "--format=json"],
             check=False,
-            encoding="utf-8",
         )
         if result.returncode == 0 and result.stdout.strip():
             return frozenset(p["name"] for p in json.loads(result.stdout))
         return frozenset()
 
     @staticmethod
-    def get_pyproject_toml() -> frozendict[str, Any]:
+    def get_pyproject_toml(filename: str = "pyproject.toml") -> frozendict[str, Any]:
         try:
-            with open("pyproject.toml", "rb") as f:
+            with open(filename, "rb") as f:
                 return frozendict(tomllib.load(f))
         except OSError:
             return frozendict()

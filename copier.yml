@@ -58,6 +58,16 @@ config_stage1:
   default: "{{ base_config | expand_config({}) }}"
   when: false
 
+uv_version:
+  type: str
+  default: "{{ '' | get_uv_version }}"
+  when: false
+
+uv_build_spec:
+  type: str
+  default: "{{ '' | get_uv_build_spec }}"
+  when: false
+
 python_version:
   type: str
   default: "{{ '' | get_python_version }}"
