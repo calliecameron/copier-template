@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os.path
 import re
@@ -278,7 +280,7 @@ class Config:
     metadata: frozendict[str, Any]
 
     @staticmethod
-    def from_yaml(data: RawConfig) -> "Config":
+    def from_yaml(data: RawConfig) -> Config:
         def _set(key: str) -> frozenset[str]:
             v = data.get(key, []) or []
             if not isinstance(v, Sequence):
@@ -575,7 +577,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "ruff": "0.13.3",
+                        "ruff": "0.14.0",
                     },
                 ),
             ),
@@ -622,8 +624,8 @@ class ConfigExtension(Extension):
                 node_packages=frozendict(
                     {
                         "@eslint/compat": "1.4.0",
-                        "@eslint/js": "9.36.0",
-                        "eslint": "9.36.0",
+                        "@eslint/js": "9.37.0",
+                        "eslint": "9.37.0",
                         "eslint-config-prettier": "10.1.8",
                         "globals": "16.4.0",
                     },
@@ -638,7 +640,7 @@ class ConfigExtension(Extension):
                 installed_by="npm",
                 node_packages=frozendict(
                     {
-                        "html-validate": "10.0.0",
+                        "html-validate": "10.1.1",
                     },
                 ),
             ),
@@ -651,8 +653,8 @@ class ConfigExtension(Extension):
                 installed_by="npm",
                 node_packages=frozendict(
                     {
-                        "stylelint": "16.24.0",
-                        "stylelint-config-standard": "39.0.0",
+                        "stylelint": "16.25.0",
+                        "stylelint-config-standard": "39.0.1",
                     },
                 ),
             ),
@@ -691,7 +693,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "tombi": "0.6.19",
+                        "tombi": "0.6.25",
                     },
                 ),
             ),
@@ -704,7 +706,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "typos": "1.37.1",
+                        "typos": "1.38.1",
                     },
                 ),
             ),
@@ -717,7 +719,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "bump-my-version": "1.2.3",
+                        "bump-my-version": "1.2.4",
                     },
                 ),
             ),

@@ -47,7 +47,6 @@ explicit_package_bases = {% if is_python_package %}false{% else %}true{% endif +
 mypy_path = "stubs"
 namespace_packages = {% if is_python_package %}false{% else %}true{% endif +%}
 pretty = true
-python_version = "{{ python_version.split(".")[:2] | join(".") }}"
 scripts_are_modules = true
 strict = true
 {% endif %}

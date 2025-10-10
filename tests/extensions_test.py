@@ -1,8 +1,7 @@
+from typing import TYPE_CHECKING
+
 import pytest
 from frozendict import frozendict
-from pyfakefs.fake_filesystem import FakeFilesystem
-from pytest_mock import MockerFixture
-from pytest_subprocess.fake_process import FakeProcess
 
 from extensions.extensions import (
     BoolTomlValue,
@@ -13,6 +12,11 @@ from extensions.extensions import (
     StrTomlValue,
     UvExtension,
 )
+
+if TYPE_CHECKING:
+    from pyfakefs.fake_filesystem import FakeFilesystem
+    from pytest_mock import MockerFixture
+    from pytest_subprocess.fake_process import FakeProcess
 
 # ruff: noqa: S101
 
