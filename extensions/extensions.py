@@ -41,13 +41,17 @@ class GitExtension(Extension):
         return default
 
 
-class UvExtension(Extension):
-    def __init__(self, environment: Environment) -> None:  # pragma: no cover
-        super().__init__(environment)
-        environment.filters["get_uv_version"] = UvExtension.get_uv_version
-        environment.filters["get_uv_build_spec"] = UvExtension.get_uv_build_spec
-        environment.filters["get_python_version"] = UvExtension.get_python_version
+class Toml:
+    @staticmethod
+    def load(filename: str) -> frozendict[str, Any]:
+        try:
+            with open(filename, "rb") as f:
+                return frozendict(tomllib.load(f))
+        except OSError:
+            return frozendict()
 
+
+class UV:
     @staticmethod
     def _uv(
         args: Sequence[str],
@@ -65,8 +69,8 @@ class UvExtension(Extension):
         )
 
     @staticmethod
-    def get_uv_version(_: str) -> str:
-        raw = UvExtension._uv(["--version"]).stdout
+    def uv_version() -> str:
+        raw = UV._uv(["--version"]).stdout
 
         match = re.search(r"[0-9]+\.[0-9]+\.[0-9]+", raw)
         if match is None:
@@ -75,9 +79,9 @@ class UvExtension(Extension):
         return match.group(0)
 
     @staticmethod
-    def get_uv_build_spec(_: str) -> str:
+    def uv_build_spec() -> str:
         with tempfile.TemporaryDirectory() as tmpdir:
-            UvExtension._uv(
+            UV._uv(
                 [
                     "init",
                     "--name",
@@ -95,9 +99,7 @@ class UvExtension(Extension):
                 ],
             )
 
-            data = UvExtension.get_pyproject_toml(
-                os.path.join(tmpdir, "pyproject.toml"),
-            )
+            data = Toml.load(os.path.join(tmpdir, "pyproject.toml"))
 
         requires: list[str] = data.get("build-system", {}).get("requires", [])
         if not requires:
@@ -108,7 +110,7 @@ class UvExtension(Extension):
     @staticmethod
     def _default_python_version() -> str:
         j = json.loads(
-            UvExtension._uv(
+            UV._uv(
                 ["python", "list", "--output-format=json", "cpython"],
             ).stdout,
         )
@@ -133,15 +135,12 @@ class UvExtension(Extension):
             return ""
 
     @staticmethod
-    def get_python_version(_: str) -> str:
-        return (
-            UvExtension._existing_python_version()
-            or UvExtension._default_python_version()
-        )
+    def python_version() -> str:
+        return UV._existing_python_version() or UV._default_python_version()
 
     @staticmethod
-    def get_python_packages() -> frozenset[str]:
-        result = UvExtension._uv(
+    def installed_python_packages() -> frozenset[str]:
+        result = UV._uv(
             ["pip", "list", "--format=json"],
             check=False,
         )
@@ -149,20 +148,8 @@ class UvExtension(Extension):
             return frozenset(p["name"] for p in json.loads(result.stdout))
         return frozenset()
 
-    @staticmethod
-    def get_pyproject_toml(filename: str = "pyproject.toml") -> frozendict[str, Any]:
-        try:
-            with open(filename, "rb") as f:
-                return frozendict(tomllib.load(f))
-        except OSError:
-            return frozendict()
 
-
-class NvmExtension(Extension):
-    def __init__(self, environment: Environment) -> None:  # pragma: no cover
-        super().__init__(environment)
-        environment.filters["get_node_version"] = NvmExtension.get_node_version
-
+class Nvm:
     @staticmethod
     def _default_node_version() -> str:
         return subprocess.run(
@@ -181,14 +168,11 @@ class NvmExtension(Extension):
             return ""
 
     @staticmethod
-    def get_node_version(_: str) -> str:
-        return (
-            NvmExtension._existing_node_version()
-            or NvmExtension._default_node_version()
-        )
+    def node_version() -> str:
+        return Nvm._existing_node_version() or Nvm._default_node_version()
 
     @staticmethod
-    def get_node_packages() -> frozenset[str]:
+    def installed_node_packages() -> frozenset[str]:
         result = subprocess.run(
             [
                 "bash",
@@ -223,30 +207,46 @@ class Tool:
     node_packages: frozendict[str, str] = frozendict()
 
 
-class TomlValue(ABC):
-    def __init__(self, *, key: str) -> None:
+class Metadata(ABC):
+    @abstractmethod
+    def get(self) -> Any | None:  # noqa: ANN401  # pragma: no cover
+        raise NotImplementedError
+
+
+class TomlValue(Metadata):
+    def __init__(
+        self,
+        *,
+        filename: str,
+        key: str,
+        default: Any | None = None,  # noqa: ANN401
+    ) -> None:
         super().__init__()
+        self._filename = filename
         self._key = tuple(part for part in key.split(".") if part)
+        self._default = default
 
     @abstractmethod
     def _typecheck(self, value: Any) -> bool:  # noqa: ANN401  # pragma: no cover
         raise NotImplementedError
 
-    def get(self, data: Mapping[str, Any]) -> Any | None:  # noqa: ANN401
+    @override
+    def get(self) -> Any | None:
+        data: Mapping[str, Any] = Toml.load(self._filename)
         for i, k in enumerate(self._key):
             if k not in data:
-                return None
+                return self._default
             v = data[k]
             if i == len(self._key) - 1:
                 if not self._typecheck(v):
                     raise TypeError(
-                        f"Value {'.'.join(self._key)} in pyproject.toml has unexpected "
-                        f"type {type(v)}",
+                        f"Value {'.'.join(self._key)} in {self._filename} has "
+                        f"unexpected type {type(v)}",
                     )
                 return v
             if not isinstance(v, dict):
                 raise TypeError(
-                    f"Indexed into pyproject.toml value {'.'.join(self._key)} that "
+                    f"Indexed into {self._filename} value {'.'.join(self._key)} that "
                     f"isn't a dict (got {type(v)})",
                 )
             data = v
@@ -265,9 +265,14 @@ class StrTomlValue(TomlValue):
         return isinstance(value, str)
 
 
-@dataclass(frozen=True, kw_only=True)
-class Metadata:
-    pyproject_toml_value: TomlValue
+class Call(Metadata):
+    def __init__(self, fn: Callable[[], Any | None]) -> None:
+        super().__init__()
+        self._fn = fn
+
+    @override
+    def get(self) -> Any | None:
+        return self._fn()
 
 
 RawConfig = Mapping[str, Sequence[str] | Mapping[str, Any] | None]
@@ -787,15 +792,19 @@ class ConfigExtension(Extension):
 
     _METADATA = frozendict[str, Metadata](
         {
-            "project_version": Metadata(
-                pyproject_toml_value=StrTomlValue(
-                    key="project.version",
-                ),
+            "uv_version": Call(UV.uv_version),
+            "uv_build_spec": Call(UV.uv_build_spec),
+            "python_version": Call(UV.python_version),
+            "node_version": Call(Nvm.node_version),
+            "file_type_tags": Call(lambda: ConfigExtension.file_type_tags()),
+            "project_version": StrTomlValue(
+                filename="pyproject.toml",
+                key="project.version",
+                default="0.0.0",
             ),
-            "is_python_package": Metadata(
-                pyproject_toml_value=BoolTomlValue(
-                    key="tool.uv.package",
-                ),
+            "is_python_package": BoolTomlValue(
+                filename="pyproject.toml",
+                key="tool.uv.package",
             ),
         },
     )
@@ -804,7 +813,6 @@ class ConfigExtension(Extension):
         super().__init__(environment)
         environment.filters["expand_config"] = ConfigExtension.expand_config
         environment.filters["detect_config"] = ConfigExtension.detect_config
-        environment.filters["file_type_tags"] = ConfigExtension.file_type_tags
         environment.filters["python_packages"] = ConfigExtension.python_packages
         environment.filters["node_packages"] = ConfigExtension.node_packages
 
@@ -847,6 +855,13 @@ class ConfigExtension(Extension):
             current_tools = new_tools
 
     @staticmethod
+    def file_type_tags() -> dict[str, list[str]]:
+        return {
+            file_type: sorted(data.tags)
+            for file_type, data in ConfigExtension._FILE_TYPES.items()
+        }
+
+    @staticmethod
     def detect_config(_: str) -> RawConfig:
         files = sorted(
             subprocess.run(
@@ -859,9 +874,8 @@ class ConfigExtension(Extension):
             .splitlines(),
         )
 
-        python_packages = UvExtension.get_python_packages()
-        node_packages = NvmExtension.get_node_packages()
-        pyproject_toml = UvExtension.get_pyproject_toml()
+        python_packages = UV.installed_python_packages()
+        node_packages = Nvm.installed_node_packages()
 
         file_types = set()
         tools = set()
@@ -890,23 +904,16 @@ class ConfigExtension(Extension):
                         tools.add(tool)
 
         metadata = {}
-        for m, m_data in ConfigExtension._METADATA.items():
-            data = m_data.pyproject_toml_value.get(pyproject_toml)
+        for m_name, m_data in ConfigExtension._METADATA.items():
+            data = m_data.get()
             if data is not None:
-                metadata[m] = data
+                metadata[m_name] = data
 
         return Config(
             file_types=frozenset(file_types),
             tools=frozenset(tools),
             metadata=frozendict(metadata),
         ).to_yaml()
-
-    @staticmethod
-    def file_type_tags(_: str) -> dict[str, list[str]]:
-        return {
-            file_type: sorted(data.tags)
-            for file_type, data in ConfigExtension._FILE_TYPES.items()
-        }
 
     @staticmethod
     def _packages(

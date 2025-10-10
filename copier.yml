@@ -8,8 +8,6 @@ _jinja_extensions:
   - cookiecutter.extensions.SlugifyExtension
   - extensions/extensions.py:StrictUndefinedExtension
   - extensions/extensions.py:GitExtension
-  - extensions/extensions.py:UvExtension
-  - extensions/extensions.py:NvmExtension
   - extensions/extensions.py:ConfigExtension
 _subdirectory: template
 _message_after_copy: |
@@ -32,11 +30,6 @@ _tasks:
   - command: .template_files/npm_post_install
     when: "{{ uses_npm }}"
 
-file_type_tags:
-  type: yaml
-  default: "{{ '' | file_type_tags }}"
-  when: false
-
 base_config:
   type: yaml
   default:
@@ -56,26 +49,6 @@ base_config:
 config_stage1:
   type: yaml
   default: "{{ base_config | expand_config({}) }}"
-  when: false
-
-uv_version:
-  type: str
-  default: "{{ '' | get_uv_version }}"
-  when: false
-
-uv_build_spec:
-  type: str
-  default: "{{ '' | get_uv_build_spec }}"
-  when: false
-
-python_version:
-  type: str
-  default: "{{ '' | get_python_version }}"
-  when: false
-
-node_version:
-  type: str
-  default: "{{ '' | get_node_version }}"
   when: false
 
 project_name:
@@ -259,6 +232,41 @@ config:
   default: "{{ user_config | expand_config(config_stage2) }}"
   when: false
 
+uv_version:
+  type: str
+  default: "{{ config['metadata']['uv_version'] }}"
+  when: false
+
+uv_build_spec:
+  type: str
+  default: "{{ config['metadata']['uv_build_spec'] }}"
+  when: false
+
+python_version:
+  type: str
+  default: "{{ config['metadata']['python_version'] }}"
+  when: false
+
+node_version:
+  type: str
+  default: "{{ config['metadata']['node_version'] }}"
+  when: false
+
+file_type_tags:
+  type: yaml
+  default: "{{ config['metadata']['file_type_tags'] }}"
+  when: false
+
+project_version:
+  type: str
+  default: "{{ config['metadata']['project_version'] }}"
+  when: false
+
+is_python_package:
+  type: bool
+  default: "{{ config['metadata']['is_python_package'] }}"
+  when: false
+
 python_packages:
   type: yaml
   default: "{{ config | python_packages }}"
@@ -267,16 +275,6 @@ python_packages:
 node_packages:
   type: yaml
   default: "{{ config | node_packages }}"
-  when: false
-
-project_version:
-  type: str
-  default: "{{ config['metadata'].get('project_version', '0.0.0') }}"
-  when: false
-
-is_python_package:
-  type: bool
-  default: "{{ config['metadata']['is_python_package'] }}"
   when: false
 
 has_shell:

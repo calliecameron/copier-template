@@ -4,13 +4,14 @@ import pytest
 from frozendict import frozendict
 
 from extensions.extensions import (
+    UV,
     BoolTomlValue,
     Config,
     ConfigExtension,
     GitExtension,
-    NvmExtension,
+    Nvm,
     StrTomlValue,
-    UvExtension,
+    Toml,
 )
 
 if TYPE_CHECKING:
@@ -33,8 +34,20 @@ class TestGitExtension:
         assert GitExtension.get_git_user_name("bar") == "bar"
 
 
-class TestUvExtension:
-    def test_get_uv_version(
+class TestToml:
+    def test_load_existing(self, fs: FakeFilesystem) -> None:
+        fs.create_file("pyproject.toml", contents='foo = "bar"')
+        assert Toml.load("pyproject.toml") == {"foo": "bar"}
+
+    def test_load_default(
+        self,
+        fs: FakeFilesystem,  # noqa: ARG002
+    ) -> None:
+        assert Toml.load("pyproject.toml") == {}
+
+
+class TestUV:
+    def test_uv_version(
         self,
         fp: FakeProcess,
         mocker: MockerFixture,
@@ -44,9 +57,9 @@ class TestUvExtension:
             ["uv", "--version"],
             stdout="uv 0.9.0",
         )
-        assert UvExtension.get_uv_version("") == "0.9.0"
+        assert UV.uv_version() == "0.9.0"
 
-    def test_get_uv_version_fails(
+    def test_uv_version_fails(
         self,
         fp: FakeProcess,
         mocker: MockerFixture,
@@ -57,9 +70,9 @@ class TestUvExtension:
             stdout="uv",
         )
         with pytest.raises(ValueError):
-            UvExtension.get_uv_version("")
+            UV.uv_version()
 
-    def test_get_uv_build_spec(
+    def test_uv_build_spec(
         self,
         fp: FakeProcess,
         fs: FakeFilesystem,
@@ -94,9 +107,9 @@ class TestUvExtension:
 requires = ["foo=bar"]
 """,
         )
-        assert UvExtension.get_uv_build_spec("") == "foo=bar"
+        assert UV.uv_build_spec() == "foo=bar"
 
-    def test_get_uv_build_spec_fails(
+    def test_uv_build_spec_fails(
         self,
         fp: FakeProcess,
         fs: FakeFilesystem,
@@ -126,17 +139,17 @@ requires = ["foo=bar"]
         )
         fs.create_file("/foo/bar/pyproject.toml")
         with pytest.raises(ValueError):
-            UvExtension.get_uv_build_spec("")
+            UV.uv_build_spec()
 
-    def test_get_python_version_existing(
+    def test_python_version_existing(
         self,
         fp: FakeProcess,  # noqa: ARG002
         fs: FakeFilesystem,
     ) -> None:
         fs.create_file(".python-version", contents="3.13.0")
-        assert UvExtension.get_python_version("") == "3.13.0"
+        assert UV.python_version() == "3.13.0"
 
-    def test_get_python_version_default(
+    def test_python_version_default(
         self,
         fp: FakeProcess,
         fs: FakeFilesystem,  # noqa: ARG002
@@ -151,9 +164,9 @@ requires = ["foo=bar"]
   {"version": "3.13.1"}
 ]""",
         )
-        assert UvExtension.get_python_version("") == "3.13.1"
+        assert UV.python_version() == "3.13.1"
 
-    def test_get_python_version_fails(
+    def test_python_version_fails(
         self,
         fp: FakeProcess,
         fs: FakeFilesystem,  # noqa: ARG002
@@ -165,9 +178,9 @@ requires = ["foo=bar"]
             stdout='[{"version": "3.14.0rc1"}]',
         )
         with pytest.raises(ValueError):
-            UvExtension.get_python_version("")
+            UV.python_version()
 
-    def test_get_python_packages(
+    def test_installed_python_packages(
         self,
         fp: FakeProcess,
         mocker: MockerFixture,
@@ -177,9 +190,9 @@ requires = ["foo=bar"]
             ["uv", "pip", "list", "--format=json"],
             '[{"name": "foo"}, {"name": "bar"}]',
         )
-        assert UvExtension.get_python_packages() == frozenset({"foo", "bar"})
+        assert UV.installed_python_packages() == frozenset({"foo", "bar"})
 
-    def test_get_python_packages_fails(
+    def test_installed_python_packages_fails(
         self,
         fp: FakeProcess,
         mocker: MockerFixture,
@@ -189,35 +202,25 @@ requires = ["foo=bar"]
             ["uv", "pip", "list", "--format=json"],
             "",
         )
-        assert UvExtension.get_python_packages() == frozenset()
+        assert UV.installed_python_packages() == frozenset()
 
         fp.register(
             ["uv", "pip", "list", "--format=json"],
             returncode=1,
         )
-        assert UvExtension.get_python_packages() == frozenset()
-
-    def test_get_pyproject_toml_existing(self, fs: FakeFilesystem) -> None:
-        fs.create_file("pyproject.toml", contents='foo = "bar"')
-        assert UvExtension.get_pyproject_toml() == {"foo": "bar"}
-
-    def test_get_pyproject_toml_default(
-        self,
-        fs: FakeFilesystem,  # noqa: ARG002
-    ) -> None:
-        assert UvExtension.get_pyproject_toml() == {}
+        assert UV.installed_python_packages() == frozenset()
 
 
-class TestNvmExtension:
-    def test_get_node_version_existing(
+class TestNvm:
+    def test_node_version_existing(
         self,
         fp: FakeProcess,  # noqa: ARG002
         fs: FakeFilesystem,
     ) -> None:
         fs.create_file(".nvmrc", contents="v24.6.0")
-        assert NvmExtension.get_node_version("") == "v24.6.0"
+        assert Nvm.node_version() == "v24.6.0"
 
-    def test_get_node_version_default(
+    def test_node_version_default(
         self,
         fp: FakeProcess,
         fs: FakeFilesystem,  # noqa: ARG002
@@ -226,9 +229,9 @@ class TestNvmExtension:
             ["bash", "-c", 'source "${NVM_DIR}/nvm.sh" && nvm version stable'],
             stdout="v24.5.0",
         )
-        assert NvmExtension.get_node_version("") == "v24.5.0"
+        assert Nvm.node_version() == "v24.5.0"
 
-    def test_get_node_packages(self, fp: FakeProcess) -> None:
+    def test_installed_node_packages(self, fp: FakeProcess) -> None:
         fp.register(
             [
                 "bash",
@@ -237,7 +240,7 @@ class TestNvmExtension:
             ],
             "{}",
         )
-        assert NvmExtension.get_node_packages() == frozenset()
+        assert Nvm.installed_node_packages() == frozenset()
 
         fp.register(
             [
@@ -247,9 +250,9 @@ class TestNvmExtension:
             ],
             '{"dependencies": {"foo": {}, "bar": {}}}',
         )
-        assert NvmExtension.get_node_packages() == frozenset({"foo", "bar"})
+        assert Nvm.installed_node_packages() == frozenset({"foo", "bar"})
 
-    def test_get_node_packages_fails(self, fp: FakeProcess) -> None:
+    def test_installed_node_packages_fails(self, fp: FakeProcess) -> None:
         fp.register(
             [
                 "bash",
@@ -258,7 +261,7 @@ class TestNvmExtension:
             ],
             "",
         )
-        assert NvmExtension.get_node_packages() == frozenset()
+        assert Nvm.installed_node_packages() == frozenset()
 
         fp.register(
             [
@@ -268,34 +271,99 @@ class TestNvmExtension:
             ],
             returncode=1,
         )
-        assert NvmExtension.get_node_packages() == frozenset()
+        assert Nvm.installed_node_packages() == frozenset()
 
 
 class TestTomlValue:
-    def test_bool_toml_value(self) -> None:
-        b = BoolTomlValue(key="foo.bar")
-        assert b.get({}) is None
-        assert b.get({"foo": {}}) is None
-        assert b.get({"foo": {"bar": True}})
-        assert not b.get({"foo": {"bar": False}})
+    def test_bool_toml_value(self, fs: FakeFilesystem) -> None:
+        b = BoolTomlValue(filename="pyproject.toml", key="foo.bar")
+        fs.create_file("pyproject.toml", contents="")
+        assert b.get() is None
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="[foo]")
+        assert b.get() is None
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="[foo]\nbar = true")
+        assert b.get()
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="[foo]\nbar = false")
+        assert b.get() is False
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="foo = []")
         with pytest.raises(TypeError):
-            b.get({"foo": []})
+            b.get()
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="[foo]\nbar = 'baz'")
         with pytest.raises(TypeError):
-            b.get({"foo": {"bar": "baz"}})
+            b.get()
 
-        assert BoolTomlValue(key="").get({}) is None
-
-    def test_str_toml_value(self) -> None:
-        s = StrTomlValue(key="foo.bar")
-        assert s.get({}) is None
-        assert s.get({"foo": {}}) is None
-        assert s.get({"foo": {"bar": "baz"}}) == "baz"
+        b = BoolTomlValue(filename="pyproject.toml", key="foo.bar", default=False)
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="")
+        assert b.get() is False
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="[foo]")
+        assert b.get() is False
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="[foo]\nbar = true")
+        assert b.get()
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="[foo]\nbar = false")
+        assert b.get() is False
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="foo = []")
         with pytest.raises(TypeError):
-            s.get({"foo": []})
+            b.get()
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="[foo]\nbar = 'baz'")
         with pytest.raises(TypeError):
-            s.get({"foo": {"bar": True}})
+            b.get()
 
-        assert StrTomlValue(key="").get({}) is None
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="")
+        assert BoolTomlValue(filename="pyproject.toml", key="").get() is None
+
+    def test_str_toml_value(self, fs: FakeFilesystem) -> None:
+        s = StrTomlValue(filename="pyproject.toml", key="foo.bar")
+        fs.create_file("pyproject.toml", contents="")
+        assert s.get() is None
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="[foo]")
+        assert s.get() is None
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="[foo]\nbar = 'baz'")
+        assert s.get() == "baz"
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="foo = []")
+        with pytest.raises(TypeError):
+            s.get()
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="[foo]\nbar = true")
+        with pytest.raises(TypeError):
+            s.get()
+
+        s = StrTomlValue(filename="pyproject.toml", key="foo.bar", default="quux")
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="")
+        assert s.get() == "quux"
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="[foo]")
+        assert s.get() == "quux"
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="[foo]\nbar = 'baz'")
+        assert s.get() == "baz"
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="foo = []")
+        with pytest.raises(TypeError):
+            s.get()
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="[foo]\nbar = true")
+        with pytest.raises(TypeError):
+            s.get()
+
+        fs.remove("pyproject.toml")
+        fs.create_file("pyproject.toml", contents="")
+        assert StrTomlValue(filename="pyproject.toml", key="").get() is None
 
 
 class TestConfig:
@@ -459,6 +527,19 @@ class TestConfigExtension:
             },
         }
 
+    def test_file_type_tags(self) -> None:
+        assert ConfigExtension.file_type_tags() == {
+            "shell": ["shell"],
+            "python": ["pyi", "python"],
+            "javascript": ["javascript"],
+            "html": ["html"],
+            "css": ["css"],
+            "markdown": ["markdown"],
+            "json": ["json"],
+            "yaml": ["yaml"],
+            "toml": ["toml"],
+        }
+
     def test_detect_config(
         self,
         fp: FakeProcess,
@@ -466,6 +547,9 @@ class TestConfigExtension:
         mocker: MockerFixture,
     ) -> None:
         mocker.patch("os.getenv").return_value = "uv"
+        mocker.patch(
+            "tempfile.TemporaryDirectory",
+        ).return_value.__enter__.return_value = "/foo/bar"
 
         fs.create_file("foo.py", contents="")
         fs.create_file("bar/bar", contents="#!/bin/bash")
@@ -482,6 +566,15 @@ version = "1.2.3"
 package = false
 """,
         )
+        fs.create_file(".python-version", contents="3.13.0")
+        fs.create_file(".nvmrc", contents="v24.6.0")
+        fs.create_file(
+            "/foo/bar/pyproject.toml",
+            contents="""
+[build-system]
+requires = ["foo=bar"]
+""",
+        )
 
         fp.register(
             ["git", "ls-files", "--cached", "--others", "--exclude-standard"],
@@ -491,6 +584,28 @@ package = false
                 "baz.bats",
                 "quux",
                 "conftest.py",
+            ],
+        )
+        fp.register(
+            ["uv", "--version"],
+            stdout="uv 0.9.0",
+        )
+        fp.register(
+            [
+                "uv",
+                "init",
+                "--name",
+                "temp",
+                "--bare",
+                "--package",
+                "--build-backend",
+                "uv",
+                "--vcs",
+                "none",
+                "--author-from",
+                "none",
+                "--no-workspace",
+                "/foo/bar",
             ],
         )
         fp.register(
@@ -510,16 +625,25 @@ package = false
             "file_types": ["python", "shell"],
             "tools": ["bats", "mypy", "prettier", "pytest"],
             "metadata": {
+                "uv_version": "0.9.0",
+                "uv_build_spec": "foo=bar",
+                "python_version": "3.13.0",
+                "node_version": "v24.6.0",
+                "file_type_tags": {
+                    "shell": ["shell"],
+                    "python": ["pyi", "python"],
+                    "javascript": ["javascript"],
+                    "html": ["html"],
+                    "css": ["css"],
+                    "markdown": ["markdown"],
+                    "json": ["json"],
+                    "yaml": ["yaml"],
+                    "toml": ["toml"],
+                },
                 "project_version": "1.2.3",
                 "is_python_package": False,
             },
         }
-
-    def test_file_type_tags(self) -> None:
-        tags = ConfigExtension.file_type_tags("")
-        assert tags
-        for l in tags.values():
-            assert l == sorted(l)
 
     def test_python_packages(self) -> None:
         assert ConfigExtension.python_packages(
