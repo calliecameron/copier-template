@@ -560,7 +560,7 @@ class ConfigExtension(Extension):
                 python_packages=frozendict(
                     {
                         "cookiecutter": "2.6.0",
-                        "copier": "9.10.2",
+                        "copier": "9.10.3",
                         "copier-template-extensions": "0.3.3",
                         "identify": "2.6.15",
                     },
@@ -676,7 +676,7 @@ class ConfigExtension(Extension):
                 node_packages=frozendict(
                     {
                         "bats": "1.12.0",
-                        "bats-assert": "2.2.0",
+                        "bats-assert": "2.2.4",
                         "bats-support": "0.3.0",
                     },
                 ),
@@ -691,7 +691,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "ruff": "0.14.0",
+                        "ruff": "0.14.1",
                     },
                 ),
             ),
@@ -741,8 +741,8 @@ class ConfigExtension(Extension):
                 node_packages=frozendict(
                     {
                         "@eslint/compat": "1.4.0",
-                        "@eslint/js": "9.37.0",
-                        "eslint": "9.37.0",
+                        "@eslint/js": "9.38.0",
+                        "eslint": "9.38.0",
                         "eslint-config-prettier": "10.1.8",
                         "globals": "16.4.0",
                     },
@@ -759,7 +759,7 @@ class ConfigExtension(Extension):
                 installed_by="npm",
                 node_packages=frozendict(
                     {
-                        "html-validate": "10.1.1",
+                        "html-validate": "10.1.2",
                     },
                 ),
             ),
@@ -820,7 +820,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "tombi": "0.6.25",
+                        "tombi": "0.6.34",
                     },
                 ),
             ),
@@ -903,7 +903,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "zizmor": "1.14.2",
+                        "zizmor": "1.15.2",
                     },
                 ),
             ),

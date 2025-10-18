@@ -1,14 +1,14 @@
 {
   "devDependencies": {
     "@eslint/compat": "1.4.0",
-    "@eslint/js": "9.37.0",
+    "@eslint/js": "9.38.0",
     "bats": "1.12.0",
-    "bats-assert": "2.2.0",
+    "bats-assert": "2.2.4",
     "bats-support": "0.3.0",
-    "eslint": "9.37.0",
+    "eslint": "9.38.0",
     "eslint-config-prettier": "10.1.8",
     "globals": "16.4.0",
-    "html-validate": "10.1.1",
+    "html-validate": "10.1.2",
     "license-checker-rseidelsohn": "4.4.2",
     "markdownlint-cli2": "0.18.1",
     "prettier": "3.6.2",
