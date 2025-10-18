@@ -75,26 +75,26 @@ target-version = "py{{ max_python_version | replace('.', '') }}"
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
-  "C90",
-  "D1",
-  "E741",
-  "EM",
-  "FIX",
+  "C90",  # mccabe:*
+  "D1",  # pydocstyle:undocumented-*
+  "E741",  # pycodestyle:ambiguous-variable-name
+  "EM",  # flake8-errmsg:*
+  "FIX",  # flake8-fixme:*
 {% if not is_python_package %}
-  "INP001",
+  "INP001",  # flake8-no-pep420:implicit-namespace-package
 {% endif %}
-  "PLR09",
+  "PLR09",  # refactor:too-many-*
 {% if uses_pytest %}
-  "PT011",
+  "PT011",  # flake8-pytest-style:pytest-raises-too-broad
 {% endif %}
-  "PTH",
-  "PYI025",
-  "S603",
-  "S607",
-  "T20",
-  "TD",
-  "TRY003",
-  "TRY301",
+  "PTH",  # flake8-use-pathlib:*
+  "PYI025",  # flake8-pyi:unaliased-collections-abc-set-import
+  "S603",  # flake8-bandit:subprocess-without-shell-equals-true
+  "S607",  # flake8-bandit:start-process-with-partial-path
+  "T20",  # flake8-print:*
+  "TD",  # flake8-todos:*
+  "TRY003",  # tryceratops:raise-vanilla-args
+  "TRY301",  # tryceratops:raise-within-try
 ]
 {% endif %}
 {% if uses_tombi %}
