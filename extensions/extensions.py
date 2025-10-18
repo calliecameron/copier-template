@@ -265,13 +265,24 @@ class FileType:
 
 @dataclass(frozen=True, kw_only=True)
 class Tool:
-    config_file_types: frozenset[str]
+    owned_config_files: frozendict[str, str | None]
+    shared_config_files: frozendict[str, str | None]
     installed_by: str | None
     requires: frozenset[str] = frozenset()
-    tags: frozenset[str] = frozenset()
+    owned_tags: frozenset[str] = frozenset()
     file_regexes: frozenset[str] = frozenset()
     python_packages: frozendict[str, str] = frozendict()
     node_packages: frozendict[str, str] = frozendict()
+
+    def all_config_file_types(self) -> frozenset[str]:
+        return frozenset(
+            {
+                t
+                for t in set(self.owned_config_files.values())
+                | set(self.shared_config_files.values())
+                if t
+            },
+        )
 
 
 class Metadata(ABC):
@@ -514,14 +525,17 @@ class ConfigExtension(Extension):
     _TOOLS: frozendict[str, Tool] = frozendict(
         {
             "uv": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(
                     {
-                        # also .python-version, uv.lock
-                        "toml",  # pyproject.toml
-                        "shell",  # .template_files/{uv_install_deps,uv_update_deps}
-                        "python",  # .template_files/uv_outdated_deps.py
+                        r"pyproject\.toml": "toml",
+                        r"uv\.lock": None,
+                        r"\.python-version": None,
+                        r"\.template_files/uv_(install_deps|post_install|update_deps"
+                        r"|update_python)": "shell",
+                        r"\.template_files/uv_.*\.py": "python",
                     },
                 ),
+                shared_config_files=frozendict(),
                 installed_by=None,
                 requires=frozenset(
                     {
@@ -536,11 +550,12 @@ class ConfigExtension(Extension):
                 ),
             ),
             "copier": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(
                     {
-                        "yaml",  # .copier-answers.yml
+                        r"\.copier-answers\.yml": "yaml",
                     },
                 ),
+                shared_config_files=frozendict(),
                 installed_by="uv",
                 python_packages=frozendict(
                     {
@@ -552,11 +567,13 @@ class ConfigExtension(Extension):
                 ),
             ),
             "pre-commit": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(
                     {
-                        "yaml",  # .pre-commit-config.yaml
+                        r"\.pre-commit-config\.yaml": "yaml",
+                        r"\.template_files/(pre_commit_install|pre_push)": "shell",
                     },
                 ),
+                shared_config_files=frozendict(),
                 installed_by="uv",
                 python_packages=frozendict(
                     {
@@ -565,7 +582,8 @@ class ConfigExtension(Extension):
                 ),
             ),
             "python-license-checker": Tool(
-                config_file_types=frozenset(),
+                owned_config_files=frozendict(),
+                shared_config_files=frozendict(),
                 installed_by="uv",
                 python_packages=frozendict(
                     {
@@ -574,13 +592,16 @@ class ConfigExtension(Extension):
                 ),
             ),
             "npm": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(
                     {
-                        # also .nvmrc, .npmrc
-                        "json",  # package.json, package-lock.json
-                        "shell",  # .template_files/{npm_install_deps,npm_update_deps}
+                        r"package\.json": "json",
+                        r"package-lock\.json": "json",
+                        r"\.nvmrc": None,
+                        r"\.npmrc": None,
+                        r"\.template_files/npm_.*": "shell",
                     },
                 ),
+                shared_config_files=frozendict(),
                 installed_by=None,
                 requires=frozenset(
                     {
@@ -589,7 +610,8 @@ class ConfigExtension(Extension):
                 ),
             ),
             "node-license-checker": Tool(
-                config_file_types=frozenset(),
+                owned_config_files=frozendict(),
+                shared_config_files=frozendict(),
                 installed_by="npm",
                 node_packages=frozendict(
                     {
@@ -598,10 +620,14 @@ class ConfigExtension(Extension):
                 ),
             ),
             "prettier": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(
                     {
-                        # also .prettierignore
-                        "json",  # package.json
+                        r"\.prettierignore": None,
+                    },
+                ),
+                shared_config_files=frozendict(
+                    {
+                        r"package\.json": "json",
                     },
                 ),
                 installed_by="npm",
@@ -612,7 +638,12 @@ class ConfigExtension(Extension):
                 ),
             ),
             "shellcheck": Tool(
-                config_file_types=frozenset(),  # .shellcheckrc
+                owned_config_files=frozendict(
+                    {
+                        r"\.shellcheckrc": None,
+                    },
+                ),
+                shared_config_files=frozendict(),
                 installed_by="uv",
                 python_packages=frozendict(
                     {
@@ -621,17 +652,23 @@ class ConfigExtension(Extension):
                 ),
             ),
             "shfmt": Tool(
-                config_file_types=frozenset(),  # .editorconfig
+                owned_config_files=frozendict(),
+                shared_config_files=frozendict(
+                    {
+                        r"\.editorconfig": None,
+                    },
+                ),
                 installed_by=None,
             ),
             "bats": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(
                     {
-                        "shell",  # .template_files/bats
+                        r"\.template_files/bats": "shell",
                     },
                 ),
+                shared_config_files=frozendict(),
                 installed_by="npm",
-                tags=frozenset(
+                owned_tags=frozenset(
                     {
                         "bats",
                     },
@@ -645,9 +682,10 @@ class ConfigExtension(Extension):
                 ),
             ),
             "ruff": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(),
+                shared_config_files=frozendict(
                     {
-                        "toml",  # pyproject.toml
+                        r"pyproject\.toml": "toml",
                     },
                 ),
                 installed_by="uv",
@@ -658,9 +696,10 @@ class ConfigExtension(Extension):
                 ),
             ),
             "mypy": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(),
+                shared_config_files=frozendict(
                     {
-                        "toml",  # pyproject.toml
+                        r"pyproject\.toml": "toml",
                     },
                 ),
                 installed_by="uv",
@@ -671,9 +710,10 @@ class ConfigExtension(Extension):
                 ),
             ),
             "pytest": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(),
+                shared_config_files=frozendict(
                     {
-                        "toml",  # pyproject.toml
+                        r"pyproject\.toml": "toml",
                     },
                 ),
                 installed_by="uv",
@@ -691,11 +731,12 @@ class ConfigExtension(Extension):
                 ),
             ),
             "eslint": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(
                     {
-                        "javascript",  # eslint.config.mjs
+                        r"eslint\.config\.mjs": "javascript",
                     },
                 ),
+                shared_config_files=frozendict(),
                 installed_by="npm",
                 node_packages=frozendict(
                     {
@@ -708,11 +749,13 @@ class ConfigExtension(Extension):
                 ),
             ),
             "htmlvalidate": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(
                     {
-                        "json",  # .htmlvalidate.json
+                        r"\.htmlvalidate\.json": "json",
+                        r"\.htmlvalidateignore": None,
                     },
                 ),
+                shared_config_files=frozendict(),
                 installed_by="npm",
                 node_packages=frozendict(
                     {
@@ -721,9 +764,14 @@ class ConfigExtension(Extension):
                 ),
             ),
             "stylelint": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(
                     {
-                        "json",  # package.json
+                        r"\.stylelintignore": None,
+                    },
+                ),
+                shared_config_files=frozendict(
+                    {
+                        r"package\.json": "json",
                     },
                 ),
                 installed_by="npm",
@@ -735,11 +783,12 @@ class ConfigExtension(Extension):
                 ),
             ),
             "markdownlint": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(
                     {
-                        "json",  # .markdownlint.json
+                        r"\.markdownlint\.json": "json",
                     },
                 ),
+                shared_config_files=frozendict(),
                 installed_by="npm",
                 node_packages=frozendict(
                     {
@@ -748,11 +797,12 @@ class ConfigExtension(Extension):
                 ),
             ),
             "yamllint": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(
                     {
-                        "yaml",  # .yamllint.yml
+                        r"\.yamllint\.yml": "yaml",
                     },
                 ),
+                shared_config_files=frozendict(),
                 installed_by="uv",
                 python_packages=frozendict(
                     {
@@ -761,9 +811,10 @@ class ConfigExtension(Extension):
                 ),
             ),
             "tombi": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(),
+                shared_config_files=frozendict(
                     {
-                        "toml",  # pyproject.toml
+                        r"pyproject\.toml": "toml",
                     },
                 ),
                 installed_by="uv",
@@ -774,27 +825,25 @@ class ConfigExtension(Extension):
                 ),
             ),
             "ast-grep": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(
                     {
-                        "yaml",  # sgconfig.yml, .ast_grep/*.yml
+                        r"sgconfig\.yml": "yaml",
+                        r"\.ast_grep/.*\.yml": "yaml",
                     },
                 ),
+                shared_config_files=frozendict(),
                 installed_by="uv",
                 python_packages=frozendict(
                     {
                         "ast-grep-cli": "0.39.6",
                     },
                 ),
-                file_regexes=frozenset(
-                    {
-                        r"\.ast_grep/.*",
-                    },
-                ),
             ),
             "typos": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(),
+                shared_config_files=frozendict(
                     {
-                        "toml",  # pyproject.toml
+                        r"pyproject\.toml": "toml",
                     },
                 ),
                 installed_by="uv",
@@ -805,9 +854,10 @@ class ConfigExtension(Extension):
                 ),
             ),
             "bump-my-version": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(),
+                shared_config_files=frozendict(
                     {
-                        "toml",  # pyproject.toml
+                        r"pyproject\.toml": "toml",
                     },
                 ),
                 installed_by="uv",
@@ -818,19 +868,21 @@ class ConfigExtension(Extension):
                 ),
             ),
             "gitleaks": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(
                     {
-                        "toml",  # .gitleaks.toml
+                        r"\.gitleaks\.toml": "toml",
                     },
                 ),
+                shared_config_files=frozendict(),
                 installed_by=None,
             ),
             "github-actions": Tool(
-                config_file_types=frozenset(
+                owned_config_files=frozendict(
                     {
-                        "yaml",  # .github/workflows/*.yml
+                        r"\.github/workflows/.*\.yml": "yaml",
                     },
                 ),
+                shared_config_files=frozendict(),
                 installed_by=None,
                 requires=frozenset(
                     {
@@ -839,18 +891,15 @@ class ConfigExtension(Extension):
                         "gha-update",
                     },
                 ),
-                file_regexes=frozenset(
-                    {
-                        r"\.github/workflows/.*.yml",
-                    },
-                ),
             ),
             "actionlint": Tool(
-                config_file_types=frozenset(),
+                owned_config_files=frozendict(),
+                shared_config_files=frozendict(),
                 installed_by=None,
             ),
             "zizmor": Tool(
-                config_file_types=frozenset(),
+                owned_config_files=frozendict(),
+                shared_config_files=frozendict(),
                 installed_by="uv",
                 python_packages=frozendict(
                     {
@@ -859,7 +908,8 @@ class ConfigExtension(Extension):
                 ),
             ),
             "gha-update": Tool(
-                config_file_types=frozenset(),
+                owned_config_files=frozendict(),
+                shared_config_files=frozendict(),
                 installed_by="uv",
                 python_packages=frozendict(
                     {
@@ -868,7 +918,12 @@ class ConfigExtension(Extension):
                 ),
             ),
             "gitlint": Tool(
-                config_file_types=frozenset(),  # .gitlint
+                owned_config_files=frozendict(
+                    {
+                        r"\.gitlint": None,
+                    },
+                ),
+                shared_config_files=frozendict(),
                 installed_by="uv",
                 python_packages=frozendict(
                     {
@@ -945,7 +1000,9 @@ class ConfigExtension(Extension):
             new_tools.update(tools_to_add)
 
             for tool in new_tools:
-                new_file_types.update(ConfigExtension._TOOLS[tool].config_file_types)
+                new_file_types.update(
+                    ConfigExtension._TOOLS[tool].all_config_file_types(),
+                )
 
             if new_file_types == current_file_types and new_tools == current_tools:
                 return Config(
@@ -995,14 +1052,16 @@ class ConfigExtension(Extension):
 
             for tool, tool_data in ConfigExtension._TOOLS.items():
                 if (
-                    tool_data.tags & tags
+                    tool_data.owned_tags & tags
                     or tool_data.python_packages.keys() & python_packages
                     or tool_data.node_packages.keys() & node_packages
                 ):
                     tools.add(tool)
                     continue
 
-                for regex in tool_data.file_regexes:
+                for regex in (
+                    tool_data.owned_config_files.keys() | tool_data.file_regexes
+                ):
                     if re.fullmatch(regex, file) is not None:
                         tools.add(tool)
 

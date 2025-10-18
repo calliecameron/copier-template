@@ -15,6 +15,7 @@ from extensions.extensions import (
     PythonExtension,
     StrTomlValue,
     Toml,
+    Tool,
 )
 
 if TYPE_CHECKING:
@@ -342,6 +343,25 @@ class TestNvm:
         assert Nvm.installed_node_packages() == frozenset()
 
 
+class TestTool:
+    def test_all_config_file_types(self) -> None:
+        assert Tool(
+            owned_config_files=frozendict(
+                {
+                    r"foo": "a",
+                    r"bar": None,
+                },
+            ),
+            shared_config_files=frozendict(
+                {
+                    r"baz": "a",
+                    r"quux": "b",
+                },
+            ),
+            installed_by=None,
+        ).all_config_file_types() == frozenset({"a", "b"})
+
+
 class TestTomlValue:
     def test_bool_toml_value(self, fs: FakeFilesystem) -> None:
         b = BoolTomlValue(filename="pyproject.toml", key="foo.bar")
@@ -653,6 +673,9 @@ requires = ["foo=bar"]
                 "baz.bats",
                 "quux",
                 "conftest.py",
+                "pyproject.toml",
+                ".nvmrc",
+                "/foo/bar/pyproject.toml",
             ],
         )
         fp.register(
@@ -691,8 +714,19 @@ requires = ["foo=bar"]
         )
 
         assert ConfigExtension.detect_config("") == {
-            "file_types": ["python", "shell"],
-            "tools": ["bats", "mypy", "prettier", "pytest"],
+            "file_types": [
+                "python",
+                "shell",
+                "toml",
+            ],
+            "tools": [
+                "bats",
+                "mypy",
+                "npm",
+                "prettier",
+                "pytest",
+                "uv",
+            ],
             "metadata": {
                 "uv_version": "0.9.0",
                 "uv_build_spec": "foo=bar",
