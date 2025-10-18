@@ -3,6 +3,9 @@
 {% if uses_shellcheck %}
   "shellcheck.executablePath": "${workspaceFolder}/.venv/bin/shellcheck",
 {% endif %}
+{% if uses_ast_grep %}
+  "astGrep.serverPath": ".venv/bin/ast-grep"
+{% endif %}
 }
 {% endset %}
 {{ content | from_yaml | to_nice_json(indent=2) }}
