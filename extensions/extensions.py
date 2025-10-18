@@ -409,6 +409,7 @@ class ConfigExtension(Extension):
                     {
                         "ruff",
                         "mypy",
+                        "ast-grep",
                     },
                 ),
                 tags=frozenset(
@@ -769,6 +770,24 @@ class ConfigExtension(Extension):
                 python_packages=frozendict(
                     {
                         "tombi": "0.6.25",
+                    },
+                ),
+            ),
+            "ast-grep": Tool(
+                config_file_types=frozenset(
+                    {
+                        "yaml",  # sgconfig.yml, .ast_grep/*.yml
+                    },
+                ),
+                installed_by="uv",
+                python_packages=frozendict(
+                    {
+                        "ast-grep-cli": "0.39.6",
+                    },
+                ),
+                file_regexes=frozenset(
+                    {
+                        r"\.ast_grep/.*",
                     },
                 ),
             ),

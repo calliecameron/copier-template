@@ -57,6 +57,9 @@ test_fast: deps
 	uv run{% if version != max_python_version %} --isolated{% endif %}{% if max_python_version != min_python_version %} --python '{{ version }}'{% endif %} pytest -m 'not slow' tests
 {% endfor %}
 {% endif %}
+{% if uses_ast_grep %}
+	uv run ast-grep test --update-all
+{% endif %}
 
 # Slow tests are only run in CI
 .PHONY: test_slow

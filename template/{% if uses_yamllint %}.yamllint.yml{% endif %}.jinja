@@ -1,8 +1,13 @@
 extends: default
-{% if uses_copier %}
+{% if uses_copier or uses_ast_grep %}
 
 ignore:
+{% if uses_copier %}
   - "/{{ _copier_conf.answers_file }}"
+{% endif %}
+{% if uses_ast_grep %}
+  - "/.ast_grep/tests/__snapshots__/*.yml"
+{% endif %}
 {% endif %}
 
 rules:

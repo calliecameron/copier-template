@@ -1,0 +1,19 @@
+id: no-raise-notimplementederror-in-special-method
+snapshots:
+  ? |
+    def __eq__(self, other):
+      raise NotImplementedError
+  : fixed: |
+      def __eq__(self, other):
+        return NotImplemented
+    labels:
+    - source: raise NotImplementedError
+      style: primary
+      start: 27
+      end: 52
+    - source: |-
+        def __eq__(self, other):
+          raise NotImplementedError
+      style: secondary
+      start: 0
+      end: 52

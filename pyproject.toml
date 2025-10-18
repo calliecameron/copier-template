@@ -9,6 +9,7 @@ dependencies = []
 
 [dependency-groups]
 dev = [
+  "ast-grep-cli==0.39.6",
   "bump-my-version==1.2.4",
   "cookiecutter==2.6.0",
   "copier==9.10.2",

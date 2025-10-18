@@ -1,0 +1,12 @@
+id: no-raise-notimplementederror-in-special-method
+valid:
+  - |
+    def foo(self):
+      raise NotImplementedError
+  - |
+    def __eq__(self, other):
+      return NotImplemented
+invalid:
+  - |
+    def __eq__(self, other):
+      raise NotImplementedError

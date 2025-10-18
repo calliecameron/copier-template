@@ -37,6 +37,7 @@ test_fast: deps
 	uv run --python '3.14' pytest -m 'not slow' tests
 	uv run --isolated --python '3.13' pytest -m 'not slow' tests
 	uv run --isolated --python '3.12' pytest -m 'not slow' tests
+	uv run ast-grep test --update-all
 
 # Slow tests are only run in CI
 .PHONY: test_slow

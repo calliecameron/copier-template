@@ -535,6 +535,7 @@ class TestConfigExtension:
                 "yaml",
             ],
             "tools": [
+                "ast-grep",
                 "mypy",
                 "node-license-checker",
                 "npm",
@@ -574,6 +575,7 @@ class TestConfigExtension:
                 "yaml",
             ],
             "tools": [
+                "ast-grep",
                 "markdownlint",
                 "mypy",
                 "node-license-checker",
