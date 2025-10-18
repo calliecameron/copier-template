@@ -1,4 +1,4 @@
-id: no-raise-notimplementederror-in-special-method
+id: special-method-raises-notimplementederror
 snapshots:
   ? |
     def __eq__(self, other):

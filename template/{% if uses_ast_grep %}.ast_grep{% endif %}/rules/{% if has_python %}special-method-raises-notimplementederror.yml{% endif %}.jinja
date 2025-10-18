@@ -1,4 +1,4 @@
-id: no-raise-notimplementederror-in-special-method
+id: special-method-raises-notimplementederror
 language: Python
 rule:
   pattern: raise NotImplementedError
@@ -58,5 +58,7 @@ constraints:
       - pattern: __ixor__
       - pattern: __ior__
 fix: return NotImplemented
-message: Special methods should return NotImplemented instead of raising NotImplementedError
+message: Special methods should not raise NotImplementedError
+note: Return NotImplemented instead
 severity: warning
+url: "https://docs.python.org/3/library/constants.html#NotImplemented"
