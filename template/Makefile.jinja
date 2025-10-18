@@ -1,3 +1,5 @@
+MAKEFLAGS += --no-builtin-rules --no-builtin-variables
+
 .PHONY: all
 all: precommit
 
