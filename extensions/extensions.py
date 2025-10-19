@@ -820,7 +820,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "tombi": "0.6.34",
+                        "tombi": "0.6.35",
                     },
                 ),
             ),
