@@ -577,7 +577,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "pre-commit": "4.3.0",
+                        "pre-commit": "4.4.0",
                     },
                 ),
             ),
@@ -675,7 +675,7 @@ class ConfigExtension(Extension):
                 ),
                 node_packages=frozendict(
                     {
-                        "bats": "1.12.0",
+                        "bats": "1.13.0",
                         "bats-assert": "2.2.4",
                         "bats-support": "0.3.0",
                     },
@@ -724,7 +724,7 @@ class ConfigExtension(Extension):
                 ),
                 python_packages=frozendict(
                     {
-                        "pytest": "8.4.2",
+                        "pytest": "9.0.0",
                         "pytest-cov": "7.0.0",
                         "pytest-custom_exit_code": "0.3.0",
                     },
@@ -820,7 +820,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "tombi": "0.6.41",
+                        "tombi": "0.6.42",
                     },
                 ),
             ),
