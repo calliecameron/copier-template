@@ -55,8 +55,13 @@ strict = true
 {% endif %}
 {% if uses_pytest %}
 
-[tool.pytest.ini_options]
-addopts = "--strict-markers --suppress-no-test-exit-code --cov{% if is_python_package %}={{ project_name_slug_underscore }}{% endif %} --cov-report=term-missing"
+[tool.pytest]
+addopts = [
+  "--strict-markers",
+  "--suppress-no-test-exit-code",
+  "--cov{% if is_python_package %}={{ project_name_slug_underscore }}{% endif %}",
+  "--cov-report=term-missing",
+]
 markers = ["slow"]
 {% if not is_python_package %}
 pythonpath = ["."]

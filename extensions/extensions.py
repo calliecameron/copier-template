@@ -544,7 +544,7 @@ class ConfigExtension(Extension):
                 ),
                 python_packages=frozendict(
                     {
-                        "frozendict": "2.4.6",
+                        "frozendict": "2.4.7",
                         "packaging": "25.0",
                     },
                 ),
@@ -560,7 +560,7 @@ class ConfigExtension(Extension):
                 python_packages=frozendict(
                     {
                         "cookiecutter": "2.6.0",
-                        "copier": "9.10.3",
+                        "copier": "9.11.0",
                         "copier-template-extensions": "0.3.3",
                         "identify": "2.6.15",
                     },
@@ -577,7 +577,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "pre-commit": "4.4.0",
+                        "pre-commit": "4.5.0",
                     },
                 ),
             ),
@@ -691,7 +691,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "ruff": "0.14.4",
+                        "ruff": "0.14.6",
                     },
                 ),
             ),
@@ -724,7 +724,7 @@ class ConfigExtension(Extension):
                 ),
                 python_packages=frozendict(
                     {
-                        "pytest": "9.0.0",
+                        "pytest": "9.0.1",
                         "pytest-cov": "7.0.0",
                         "pytest-custom_exit_code": "0.3.0",
                     },
@@ -740,7 +740,7 @@ class ConfigExtension(Extension):
                 installed_by="npm",
                 node_packages=frozendict(
                     {
-                        "@eslint/compat": "1.4.1",
+                        "@eslint/compat": "2.0.0",
                         "@eslint/js": "9.39.1",
                         "eslint": "9.39.1",
                         "eslint-config-prettier": "10.1.8",
@@ -759,7 +759,7 @@ class ConfigExtension(Extension):
                 installed_by="npm",
                 node_packages=frozendict(
                     {
-                        "html-validate": "10.3.0",
+                        "html-validate": "10.4.0",
                     },
                 ),
             ),
@@ -777,7 +777,7 @@ class ConfigExtension(Extension):
                 installed_by="npm",
                 node_packages=frozendict(
                     {
-                        "stylelint": "16.25.0",
+                        "stylelint": "16.26.0",
                         "stylelint-config-standard": "39.0.1",
                     },
                 ),
@@ -792,7 +792,7 @@ class ConfigExtension(Extension):
                 installed_by="npm",
                 node_packages=frozendict(
                     {
-                        "markdownlint-cli2": "0.18.1",
+                        "markdownlint-cli2": "0.19.1",
                     },
                 ),
             ),
@@ -820,7 +820,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "tombi": "0.6.42",
+                        "tombi": "0.6.53",
                     },
                 ),
             ),
@@ -835,7 +835,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "ast-grep-cli": "0.39.9",
+                        "ast-grep-cli": "0.40.0",
                     },
                 ),
             ),
@@ -849,7 +849,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "typos": "1.39.0",
+                        "typos": "1.39.2",
                     },
                 ),
             ),

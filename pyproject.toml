@@ -9,35 +9,35 @@ dependencies = []
 
 [dependency-groups]
 dev = [
-  "ast-grep-cli==0.39.9",
+  "ast-grep-cli==0.40.0",
   "bump-my-version==1.2.4",
   "cookiecutter==2.6.0",
-  "copier==9.10.3",
+  "copier==9.11.0",
   "copier-template-extensions==0.3.3",
-  "frozendict==2.4.6",
+  "frozendict==2.4.7",
   "gha-update==0.2.0",
   "gitlint==0.19.1",
   "identify==2.6.15",
   "licensecheck==2025.1.0",
   "mypy==1.18.2",
   "packaging==25.0",
-  "pre-commit==4.4.0",
+  "pre-commit==4.5.0",
   "pyfakefs==5.10.2",
-  "pytest==9.0.0",
+  "pytest==9.0.1",
   "pytest-cov==7.0.0",
   "pytest-custom_exit_code==0.3.0",
   "pytest-mock==3.15.1",
   "pytest-subprocess==1.5.3",
-  "ruff==0.14.4",
+  "ruff==0.14.6",
   "shellcheck-py==0.11.0.1",
-  "tombi==0.6.42",
-  "typos==1.39.0",
+  "tombi==0.6.53",
+  "typos==1.39.2",
   "yamllint==1.37.1",
   "zizmor==1.16.3",
 ]
 
 [build-system]
-requires = ["uv_build>=0.9.8,<0.10.0"]
+requires = ["uv_build>=0.9.11,<0.10.0"]
 build-backend = "uv_build"
 
 [tool.bumpversion]
@@ -58,8 +58,13 @@ python_version = "3.14"
 scripts_are_modules = true
 strict = true
 
-[tool.pytest.ini_options]
-addopts = "--strict-markers --suppress-no-test-exit-code --cov --cov-report=term-missing"
+[tool.pytest]
+addopts = [
+  "--strict-markers",
+  "--suppress-no-test-exit-code",
+  "--cov",
+  "--cov-report=term-missing",
+]
 markers = ["slow"]
 pythonpath = ["."]
 
