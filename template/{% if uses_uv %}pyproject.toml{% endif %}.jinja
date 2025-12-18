@@ -57,8 +57,13 @@ strict = true
 
 [tool.pytest]
 addopts = [
-  "--cov{% if is_python_package %}={{ project_name_slug_underscore }}{% endif %}",
+{% if not is_python_package %}
+  "--cov",
+{% endif %}
   "--cov-report=term-missing",
+{% if is_python_package %}
+  "--cov={{ project_name_slug_underscore }}",
+{% endif %}
   "--strict-markers",
   "--suppress-no-test-exit-code",
 ]

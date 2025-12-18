@@ -46,7 +46,7 @@ install_all_options() {
         --data=user_uses_bats=true \
         "--data=max_python_version=${2}" \
         "--data=min_python_version=${1}" \
-        --data=user_is_python_package=true \
+        "--data=user_is_python_package=${3}" \
         --data=user_uses_pytest=true \
         --data=exports_requirements_txt=true \
         --data=user_has_javascript=true \
@@ -57,21 +57,41 @@ install_all_options() {
 }
 
 # bats test_tags=slow
-@test "install all options 3.14" {
-    install_all_options 3.14 3.14
+@test "install all options 3.14 package" {
+    install_all_options 3.14 3.14 true
 }
 
 # bats test_tags=slow
-@test "install all options 3.13" {
-    install_all_options 3.13 3.13
+@test "install all options 3.13 package" {
+    install_all_options 3.13 3.13 true
 }
 
 # bats test_tags=slow
-@test "install all options 3.12" {
-    install_all_options 3.12 3.12
+@test "install all options 3.12 package" {
+    install_all_options 3.12 3.12 true
 }
 
 # bats test_tags=slow
-@test "install all options multi" {
-    install_all_options 3.12 3.14
+@test "install all options multi package" {
+    install_all_options 3.12 3.14 true
+}
+
+# bats test_tags=slow
+@test "install all options 3.14 no package" {
+    install_all_options 3.14 3.14 false
+}
+
+# bats test_tags=slow
+@test "install all options 3.13 no package" {
+    install_all_options 3.13 3.13 false
+}
+
+# bats test_tags=slow
+@test "install all options 3.12 no package" {
+    install_all_options 3.12 3.12 false
+}
+
+# bats test_tags=slow
+@test "install all options multi no package" {
+    install_all_options 3.12 3.14 false
 }
