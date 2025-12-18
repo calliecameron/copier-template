@@ -37,7 +37,7 @@ repos:
       - id: npm-sync
         name: "npm: sync"
         language: system
-        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npm install'
         files: "^(package\\.json|package-lock\\.json)$"
         pass_filenames: false
   - repo: local
@@ -45,7 +45,7 @@ repos:
       - id: npm-licenses
         name: "npm: check licenses"
         language: system
-        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx license-checker-rseidelsohn --production --failOn "GPL-1.0-only; GPL-1.0-or-later; GPL-2.0-only; GPL-2.0-or-later; GPL-3.0-only; GPL-3.0-or-later; AGPL-1.0-only; AGPL-1.0-or-later; AGPL-3.0-only; AGPL-3.0-or-later"'
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npx license-checker-rseidelsohn --production --failOn "GPL-1.0-only; GPL-1.0-or-later; GPL-2.0-only; GPL-2.0-or-later; GPL-3.0-only; GPL-3.0-or-later; AGPL-1.0-only; AGPL-1.0-or-later; AGPL-3.0-only; AGPL-3.0-or-later"'
         files: "^(package\\.json|package-lock\\.json)$"
         pass_filenames: false
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -95,7 +95,7 @@ repos:
       - id: prettier
         name: "general: prettier"
         language: system
-        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx prettier --write --ignore-unknown "${@}"' --
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npx prettier --write --ignore-unknown "${@}"' --
         types_or:
           - text
   - repo: local
@@ -179,7 +179,7 @@ repos:
       - id: eslint
         name: "javascript: lint"
         language: system
-        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx eslint --fix "${@}"' --
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npx eslint --fix "${@}"' --
         types_or:
           - "javascript"
   - repo: local
@@ -187,7 +187,7 @@ repos:
       - id: htmlvalidate
         name: "html: lint"
         language: system
-        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx html-validate "${@}"' --
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npx html-validate "${@}"' --
         types_or:
           - "html"
   - repo: local
@@ -195,7 +195,7 @@ repos:
       - id: stylelint
         name: "css: lint"
         language: system
-        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx stylelint --fix "${@}"' --
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npx stylelint --fix "${@}"' --
         types_or:
           - "css"
   - repo: local
@@ -203,7 +203,7 @@ repos:
       - id: markdownlint
         name: "markdown: lint"
         language: system
-        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx markdownlint-cli2 --fix "${@}"' --
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npx markdownlint-cli2 --fix "${@}"' --
         types_or:
           - "markdown"
   - repo: local

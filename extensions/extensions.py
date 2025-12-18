@@ -244,7 +244,7 @@ class Nvm:
             [
                 "bash",
                 "-c",
-                'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm list --json',
+                'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npm list --json',
             ],
             capture_output=True,
             check=False,

@@ -44,7 +44,7 @@ repos:
       - id: npm-sync
         name: "npm: sync"
         language: system
-        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm install'
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npm install'
         files: "^(package\\.json|package-lock\\.json)$"
         pass_filenames: false
 {% endif %}
@@ -54,7 +54,7 @@ repos:
       - id: npm-licenses
         name: "npm: check licenses"
         language: system
-        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx license-checker-rseidelsohn --production --failOn "GPL-1.0-only; GPL-1.0-or-later; GPL-2.0-only; GPL-2.0-or-later; GPL-3.0-only; GPL-3.0-or-later; AGPL-1.0-only; AGPL-1.0-or-later; AGPL-3.0-only; AGPL-3.0-or-later"'
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npx license-checker-rseidelsohn --production --failOn "GPL-1.0-only; GPL-1.0-or-later; GPL-2.0-only; GPL-2.0-or-later; GPL-3.0-only; GPL-3.0-or-later; AGPL-1.0-only; AGPL-1.0-or-later; AGPL-3.0-only; AGPL-3.0-or-later"'
         files: "^(package\\.json|package-lock\\.json)$"
         pass_filenames: false
 {% endif %}
@@ -110,7 +110,7 @@ repos:
       - id: prettier
         name: "general: prettier"
         language: system
-        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx prettier --write --ignore-unknown "${@}"' --
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npx prettier --write --ignore-unknown "${@}"' --
         types_or:
           - text
 {% endif %}
@@ -181,7 +181,7 @@ repos:
       - id: eslint
         name: "javascript: lint"
         language: system
-        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx eslint --fix "${@}"' --
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npx eslint --fix "${@}"' --
         types_or:
 {% for tag in file_type_tags["javascript"] %}
           - "{{ tag }}"
@@ -193,7 +193,7 @@ repos:
       - id: htmlvalidate
         name: "html: lint"
         language: system
-        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx html-validate "${@}"' --
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npx html-validate "${@}"' --
         types_or:
 {% for tag in file_type_tags["html"] %}
           - "{{ tag }}"
@@ -205,7 +205,7 @@ repos:
       - id: stylelint
         name: "css: lint"
         language: system
-        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx stylelint --fix "${@}"' --
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npx stylelint --fix "${@}"' --
         types_or:
 {% for tag in file_type_tags["css"] %}
           - "{{ tag }}"
@@ -217,7 +217,7 @@ repos:
       - id: markdownlint
         name: "markdown: lint"
         language: system
-        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npx markdownlint-cli2 --fix "${@}"' --
+        entry: bash -c 'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npx markdownlint-cli2 --fix "${@}"' --
         types_or:
 {% for tag in file_type_tags["markdown"] %}
           - "{{ tag }}"

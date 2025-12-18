@@ -305,7 +305,7 @@ class TestNvm:
             [
                 "bash",
                 "-c",
-                'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm list --json',
+                'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npm list --json',
             ],
             "{}",
         )
@@ -315,7 +315,7 @@ class TestNvm:
             [
                 "bash",
                 "-c",
-                'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm list --json',
+                'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npm list --json',
             ],
             '{"dependencies": {"foo": {}, "bar": {}}}',
         )
@@ -326,7 +326,7 @@ class TestNvm:
             [
                 "bash",
                 "-c",
-                'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm list --json',
+                'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npm list --json',
             ],
             "",
         )
@@ -336,7 +336,7 @@ class TestNvm:
             [
                 "bash",
                 "-c",
-                'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm list --json',
+                'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npm list --json',
             ],
             returncode=1,
         )
@@ -708,7 +708,7 @@ requires = ["foo=bar"]
             [
                 "bash",
                 "-c",
-                'source "${NVM_DIR}/nvm.sh" && nvm exec --silent npm list --json',
+                'source "${NVM_DIR}/nvm.sh" && nvm exec --silent -- npm list --json',
             ],
             '{"dependencies": {"prettier": {}}}',
         )

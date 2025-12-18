@@ -6,4 +6,4 @@ BATS_LIB_PATH="$(readlink -f "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../n
 export BATS_LIB_PATH
 
 source "${NVM_DIR}/nvm.sh"
-nvm exec --silent npx bats "${@}"
+nvm exec --silent -- npx bats "${@}"
