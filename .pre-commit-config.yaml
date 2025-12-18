@@ -15,7 +15,7 @@ repos:
         files: "^(pyproject\\.toml|uv\\.lock)$"
         pass_filenames: false
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: "0.9.11"
+    rev: "0.9.18"
     hooks:
       - id: uv-export
         name: "uv: export"
@@ -252,7 +252,7 @@ repos:
         entry: uv run bump-my-version replace --allow-dirty '--new-version={current_version}'
         pass_filenames: false
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.29.1
+    rev: v8.30.0
     hooks:
       - id: gitleaks
         name: "general: check for committed secrets"

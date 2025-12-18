@@ -577,7 +577,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "pre-commit": "4.5.0",
+                        "pre-commit": "4.5.1",
                     },
                 ),
             ),
@@ -633,7 +633,7 @@ class ConfigExtension(Extension):
                 installed_by="npm",
                 node_packages=frozendict(
                     {
-                        "prettier": "3.6.2",
+                        "prettier": "3.7.4",
                     },
                 ),
             ),
@@ -691,7 +691,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "ruff": "0.14.6",
+                        "ruff": "0.14.9",
                     },
                 ),
             ),
@@ -705,7 +705,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "mypy": "1.18.2",
+                        "mypy": "1.19.1",
                     },
                 ),
             ),
@@ -724,7 +724,7 @@ class ConfigExtension(Extension):
                 ),
                 python_packages=frozendict(
                     {
-                        "pytest": "9.0.1",
+                        "pytest": "9.0.2",
                         "pytest-cov": "7.0.0",
                         "pytest-custom_exit_code": "0.3.0",
                     },
@@ -741,8 +741,8 @@ class ConfigExtension(Extension):
                 node_packages=frozendict(
                     {
                         "@eslint/compat": "2.0.0",
-                        "@eslint/js": "9.39.1",
-                        "eslint": "9.39.1",
+                        "@eslint/js": "9.39.2",
+                        "eslint": "9.39.2",
                         "eslint-config-prettier": "10.1.8",
                         "globals": "16.5.0",
                     },
@@ -759,7 +759,7 @@ class ConfigExtension(Extension):
                 installed_by="npm",
                 node_packages=frozendict(
                     {
-                        "html-validate": "10.4.0",
+                        "html-validate": "10.5.0",
                     },
                 ),
             ),
@@ -777,7 +777,7 @@ class ConfigExtension(Extension):
                 installed_by="npm",
                 node_packages=frozendict(
                     {
-                        "stylelint": "16.26.0",
+                        "stylelint": "16.26.1",
                         "stylelint-config-standard": "39.0.1",
                     },
                 ),
@@ -792,7 +792,7 @@ class ConfigExtension(Extension):
                 installed_by="npm",
                 node_packages=frozendict(
                     {
-                        "markdownlint-cli2": "0.19.1",
+                        "markdownlint-cli2": "0.20.0",
                     },
                 ),
             ),
@@ -820,7 +820,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "tombi": "0.6.53",
+                        "tombi": "0.7.7",
                     },
                 ),
             ),
@@ -835,7 +835,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "ast-grep-cli": "0.40.0",
+                        "ast-grep-cli": "0.40.3",
                     },
                 ),
             ),
@@ -849,7 +849,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "typos": "1.39.2",
+                        "typos": "1.40.0",
                     },
                 ),
             ),
@@ -863,7 +863,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "bump-my-version": "1.2.4",
+                        "bump-my-version": "1.2.5",
                     },
                 ),
             ),
@@ -903,7 +903,7 @@ class ConfigExtension(Extension):
                 installed_by="uv",
                 python_packages=frozendict(
                     {
-                        "zizmor": "1.16.3",
+                        "zizmor": "1.18.0",
                     },
                 ),
             ),
